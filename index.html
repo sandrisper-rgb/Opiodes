@@ -12,29 +12,26 @@
     --navy2: #0b3d7a;
     --teal: #008c95;
     --teal2: #00a7a7;
-    --soft: #eef8fb;
-    --card: #ffffff;
+    --card: rgba(255, 255, 255, 0.94);
     --border: #d7e4ea;
     --text: #10233f;
     --muted: #6b7a90;
   }
 
   body {
-    body {
-  font-family: Arial, sans-serif;
-  background:
-    linear-gradient(rgba(244, 249, 251, 0.88), rgba(244, 249, 251, 0.88)),
-    radial-gradient(circle at 10% 10%, rgba(0, 167, 167, 0.25), transparent 30%),
-    radial-gradient(circle at 90% 20%, rgba(8, 42, 94, 0.22), transparent 32%),
-    radial-gradient(circle at 20% 90%, rgba(127, 203, 211, 0.35), transparent 35%),
-    radial-gradient(circle at 85% 85%, rgba(0, 140, 149, 0.20), transparent 35%),
-    #f4f9fb;
-  background-attachment: fixed;
-  margin: 0;
-  padding: 0;
-  color: var(--text);
-}
-  
+    font-family: Arial, sans-serif;
+    background-image:
+      linear-gradient(rgba(244, 249, 251, 0.86), rgba(244, 249, 251, 0.86)),
+      url("opiodes.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    margin: 0;
+    padding: 0;
+    color: var(--text);
+  }
+
   .container {
     max-width: 1120px;
     margin: 28px auto;
@@ -87,7 +84,8 @@
     border: 1px solid var(--border);
     border-radius: 18px;
     padding: 22px;
-    box-shadow: 0 8px 26px rgba(30, 70, 100, 0.08);
+    box-shadow: 0 8px 26px rgba(30, 70, 100, 0.10);
+    backdrop-filter: blur(4px);
   }
 
   .grid {
@@ -137,12 +135,13 @@
   .upload-box {
     border: 1px dashed var(--teal);
     border-radius: 18px;
-    background: linear-gradient(135deg, #f2fbfb, #ffffff);
+    background: rgba(242, 251, 251, 0.94);
     padding: 24px;
     text-align: center;
     font-weight: bold;
     margin-bottom: 22px;
-    box-shadow: 0 8px 26px rgba(30, 70, 100, 0.08);
+    box-shadow: 0 8px 26px rgba(30, 70, 100, 0.10);
+    backdrop-filter: blur(4px);
   }
 
   button {
@@ -169,10 +168,11 @@
     padding: 22px;
     border: 1px solid var(--border);
     border-radius: 18px;
-    background: #ffffff;
+    background: rgba(255, 255, 255, 0.95);
     display: none;
     line-height: 1.5;
-    box-shadow: 0 8px 26px rgba(30, 70, 100, 0.08);
+    box-shadow: 0 8px 26px rgba(30, 70, 100, 0.10);
+    backdrop-filter: blur(4px);
   }
 
   .report-card {
@@ -537,13 +537,13 @@
     }
 
     function accionClinica(fenotipo) {
-      if (fenotipo === "Poor Metabolizer") {
+      if (fenotipo === "Metabolizador Lento") {
         return "Evitar codeína y tramadol por posible falta de eficacia analgésica. Considerar morfina o hidromorfona, integrando función renal, función hepática, edad, comorbilidades e interacciones.";
       }
-      if (fenotipo === "Intermediate Metabolizer") {
+      if (fenotipo === "Metabolizador Intermedio") {
         return "Usar codeína y tramadol con precaución por posible respuesta analgésica reducida. Considerar alternativa como morfina o hidromorfona si hay dolor moderado-severo, respuesta insuficiente o factores clínicos de riesgo.";
       }
-      if (fenotipo === "Ultrarapid Metabolizer") {
+      if (fenotipo === "Metabolizador Ultrarápido") {
         return "Considerar evitar codeína y tramadol por riesgo aumentado de toxicidad relacionada con conversión rápida a metabolitos activos.";
       }
       return "No se identificó una alerta farmacogenética fuerte para CYP2D6 en esta versión preliminar. Mantener evaluación clínica, vigilancia de eficacia, eventos adversos e interacciones.";
