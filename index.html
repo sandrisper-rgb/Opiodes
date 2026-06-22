@@ -20,16 +20,21 @@
   }
 
   body {
-    font-family: Arial, sans-serif;
-    background:
-      radial-gradient(circle at top left, #d7f3f6 0, transparent 35%),
-      radial-gradient(circle at bottom right, #cce9ff 0, transparent 35%),
-      #f4f9fb;
-    margin: 0;
-    padding: 0;
-    color: var(--text);
-  }
-
+    body {
+  font-family: Arial, sans-serif;
+  background:
+    linear-gradient(rgba(244, 249, 251, 0.88), rgba(244, 249, 251, 0.88)),
+    radial-gradient(circle at 10% 10%, rgba(0, 167, 167, 0.25), transparent 30%),
+    radial-gradient(circle at 90% 20%, rgba(8, 42, 94, 0.22), transparent 32%),
+    radial-gradient(circle at 20% 90%, rgba(127, 203, 211, 0.35), transparent 35%),
+    radial-gradient(circle at 85% 85%, rgba(0, 140, 149, 0.20), transparent 35%),
+    #f4f9fb;
+  background-attachment: fixed;
+  margin: 0;
+  padding: 0;
+  color: var(--text);
+}
+  
   .container {
     max-width: 1120px;
     margin: 28px auto;
