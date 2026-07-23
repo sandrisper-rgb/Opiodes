@@ -3,392 +3,610 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <title>Buscador Farmacogenético de Opioides</title>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
- <style>
-  :root {
-    --navy: #082a5e;
-    --navy2: #0b3d7a;
-    --teal: #008c95;
-    --teal2: #00a7a7;
-    --card: rgba(255, 255, 255, 0.94);
-    --border: #d7e4ea;
-    --text: #10233f;
-    --muted: #6b7a90;
-  }
+  <style>
+    :root {
+      --navy: #082a5e;
+      --navy2: #0b3d7a;
+      --teal: #008c95;
+      --teal2: #00a7a7;
+      --card: rgba(255, 255, 255, 0.94);
+      --border: #d7e4ea;
+      --text: #10233f;
+      --muted: #6b7a90;
+    }
 
-  body {
-    font-family: Arial, sans-serif;
-    background-image:
-      linear-gradient(rgba(244, 249, 251, 0.86), rgba(244, 249, 251, 0.86)),
-      url("opiodes2.png");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    margin: 0;
-    padding: 0;
-    color: var(--text);
-  }
+    body {
+      font-family: Arial, sans-serif;
+      background-image:
+        linear-gradient(
+          rgba(244, 249, 251, 0.86),
+          rgba(244, 249, 251, 0.86)
+        ),
+        url("opiodes2.png");
 
-  .container {
-    max-width: 1120px;
-    margin: 28px auto;
-    background: transparent;
-    border: none;
-    border-radius: 0;
-    padding: 0 22px 30px;
-  }
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
 
-  .title {
-    background: linear-gradient(135deg, var(--navy), var(--navy2));
-    color: white;
-    text-align: left;
-    font-weight: bold;
-    font-size: 28px;
-    padding: 26px 34px;
-    border-radius: 0 0 22px 22px;
-    margin: 0 0 26px;
-    box-shadow: 0 12px 28px rgba(8, 42, 94, 0.25);
-    letter-spacing: 0.3px;
-  }
+      margin: 0;
+      padding: 0;
+      color: var(--text);
+    }
 
-  .title::after {
-    content: "Apoyo a la decisión clínica personalizada";
-    display: block;
-    font-size: 16px;
-    font-weight: normal;
-    margin-top: 8px;
-    color: #dcecff;
-  }
-
-  .section-title {
-    text-align: left;
-    font-weight: bold;
-    font-size: 21px;
-    color: var(--teal);
-    border-bottom: none;
-    padding-bottom: 0;
-    margin: 28px 0 18px;
-  }
-
-  .section-title::before {
-    content: "●";
-    color: var(--teal2);
-    margin-right: 10px;
-  }
-
-  .grid, .grid-2 {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 22px;
-    box-shadow: 0 8px 26px rgba(30, 70, 100, 0.10);
-    backdrop-filter: blur(4px);
-  }
-
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    margin-bottom: 18px;
-  }
-
-  .grid-2 {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-    margin-bottom: 18px;
-  }
-
-  label {
-    font-weight: bold;
-    display: block;
-    margin-bottom: 8px;
-    color: var(--navy);
-    font-size: 14px;
-  }
-
-  select, input, textarea {
-    width: 100%;
-    padding: 13px 14px;
-    border: 1.5px solid #cfdbe4;
-    border-radius: 10px;
-    background: #ffffff;
-    font-size: 15px;
-    box-sizing: border-box;
-    color: var(--text);
-    outline: none;
-  }
-
-  select:focus, input:focus, textarea:focus {
-    border-color: var(--teal);
-    box-shadow: 0 0 0 3px rgba(0, 140, 149, 0.12);
-  }
-
-  textarea {
-    min-height: 86px;
-    resize: vertical;
-  }
-
-  .upload-box {
-    border: 1px dashed var(--teal);
-    border-radius: 18px;
-    background: rgba(242, 251, 251, 0.94);
-    padding: 24px;
-    text-align: center;
-    font-weight: bold;
-    margin-bottom: 22px;
-    box-shadow: 0 8px 26px rgba(30, 70, 100, 0.10);
-    backdrop-filter: blur(4px);
-  }
-
-  button {
-    display: block;
-    margin: 22px auto;
-    padding: 14px 28px;
-    background: linear-gradient(135deg, var(--teal), var(--navy));
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-weight: bold;
-    font-size: 17px;
-    cursor: pointer;
-    box-shadow: 0 8px 18px rgba(8, 42, 94, 0.22);
-  }
-
-  button:hover {
-    transform: translateY(-1px);
-    opacity: 0.95;
-  }
-
-  .result {
-    margin-top: 26px;
-    padding: 22px;
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    background: rgba(255, 255, 255, 0.95);
-    display: none;
-    line-height: 1.5;
-    box-shadow: 0 8px 26px rgba(30, 70, 100, 0.10);
-    backdrop-filter: blur(4px);
-  }
-
-  .report-card {
-    background: #ffffff;
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 18px;
-    margin: 16px 0;
-    box-shadow: 0 6px 18px rgba(30, 70, 100, 0.06);
-  }
-
-  .report-title {
-    font-weight: bold;
-    font-size: 18px;
-    margin-bottom: 12px;
-    color: var(--navy);
-  }
-
-  .badge-green, .badge-yellow, .badge-red {
-    padding: 10px 12px;
-    border-radius: 10px;
-    margin: 8px 0;
-    font-weight: bold;
-    display: block;
-  }
-
-  .badge-green {
-    background: #e8f8ef;
-    border: 1px solid #52b788;
-    color: #0d6b3f;
-  }
-
-  .badge-yellow {
-    background: #fff8df;
-    border: 1px solid #e3b341;
-    color: #7a5500;
-  }
-
-  .badge-red {
-    background: #fdecec;
-    border: 1px solid #e07171;
-    color: #9b1c1c;
-  }
-
-  .small {
-    font-size: 13px;
-    color: var(--muted);
-  }
-
-  @media (max-width: 800px) {
-    .grid, .grid-2 {
-      grid-template-columns: 1fr;
+    .container {
+      max-width: 1120px;
+      margin: 28px auto;
+      background: transparent;
+      border: none;
+      padding: 0 22px 30px;
     }
 
     .title {
-      font-size: 22px;
-      padding: 22px;
+      background: linear-gradient(
+        135deg,
+        var(--navy),
+        var(--navy2)
+      );
+
+      color: white;
+      text-align: left;
+      font-weight: bold;
+      font-size: 28px;
+
+      padding: 26px 34px;
+      border-radius: 0 0 22px 22px;
+      margin: 0 0 26px;
+
+      box-shadow: 0 12px 28px rgba(8, 42, 94, 0.25);
+      letter-spacing: 0.3px;
     }
-  }
-</style>
+
+    .title::after {
+      content: "Apoyo a la decisión clínica personalizada";
+      display: block;
+
+      font-size: 16px;
+      font-weight: normal;
+
+      margin-top: 8px;
+      color: #dcecff;
+    }
+
+    .section-title {
+      text-align: left;
+      font-weight: bold;
+      font-size: 21px;
+
+      color: var(--teal);
+
+      margin: 28px 0 18px;
+    }
+
+    .section-title::before {
+      content: "●";
+      color: var(--teal2);
+      margin-right: 10px;
+    }
+
+    .grid,
+    .grid-2 {
+      background: var(--card);
+
+      border: 1px solid var(--border);
+      border-radius: 18px;
+
+      padding: 22px;
+
+      box-shadow: 0 8px 26px rgba(30, 70, 100, 0.10);
+      backdrop-filter: blur(4px);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+
+      gap: 20px;
+      margin-bottom: 18px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+
+      gap: 20px;
+      margin-bottom: 18px;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+
+      margin-bottom: 8px;
+
+      color: var(--navy);
+      font-size: 14px;
+    }
+
+    select,
+    input,
+    textarea {
+      width: 100%;
+
+      padding: 13px 14px;
+
+      border: 1.5px solid #cfdbe4;
+      border-radius: 10px;
+
+      background: #ffffff;
+
+      font-size: 15px;
+      box-sizing: border-box;
+
+      color: var(--text);
+      outline: none;
+    }
+
+    select:focus,
+    input:focus,
+    textarea:focus {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(0, 140, 149, 0.12);
+    }
+
+    textarea {
+      min-height: 86px;
+      resize: vertical;
+    }
+
+    .upload-box {
+      border: 1px dashed var(--teal);
+      border-radius: 18px;
+
+      background: rgba(242, 251, 251, 0.94);
+
+      padding: 24px;
+
+      text-align: center;
+      font-weight: bold;
+
+      margin-bottom: 22px;
+
+      box-shadow: 0 8px 26px rgba(30, 70, 100, 0.10);
+      backdrop-filter: blur(4px);
+    }
+
+    button {
+      display: block;
+
+      margin: 22px auto;
+      padding: 14px 28px;
+
+      background: linear-gradient(
+        135deg,
+        var(--teal),
+        var(--navy)
+      );
+
+      color: white;
+
+      border: none;
+      border-radius: 10px;
+
+      font-weight: bold;
+      font-size: 17px;
+
+      cursor: pointer;
+
+      box-shadow: 0 8px 18px rgba(8, 42, 94, 0.22);
+
+      transition:
+        transform 0.2s ease,
+        opacity 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      opacity: 0.95;
+    }
+
+    button:disabled {
+      cursor: wait;
+      opacity: 0.65;
+      transform: none;
+    }
+
+    .result {
+      margin-top: 26px;
+      padding: 22px;
+
+      border: 1px solid var(--border);
+      border-radius: 18px;
+
+      background: rgba(255, 255, 255, 0.95);
+
+      display: none;
+      line-height: 1.5;
+
+      box-shadow: 0 8px 26px rgba(30, 70, 100, 0.10);
+      backdrop-filter: blur(4px);
+    }
+
+    .report-card {
+      background: #ffffff;
+
+      border: 1px solid var(--border);
+      border-radius: 16px;
+
+      padding: 18px;
+      margin: 16px 0;
+
+      box-shadow: 0 6px 18px rgba(30, 70, 100, 0.06);
+    }
+
+    .report-title {
+      font-weight: bold;
+      font-size: 18px;
+
+      margin-bottom: 12px;
+
+      color: var(--navy);
+    }
+
+    .badge-green,
+    .badge-yellow,
+    .badge-red {
+      padding: 10px 12px;
+      border-radius: 10px;
+
+      margin: 8px 0;
+
+      font-weight: bold;
+      display: block;
+    }
+
+    .badge-green {
+      background: #e8f8ef;
+      border: 1px solid #52b788;
+      color: #0d6b3f;
+    }
+
+    .badge-yellow {
+      background: #fff8df;
+      border: 1px solid #e3b341;
+      color: #7a5500;
+    }
+
+    .badge-red {
+      background: #fdecec;
+      border: 1px solid #e07171;
+      color: #9b1c1c;
+    }
+
+    .clinical-annotation {
+      margin-top: 14px;
+      padding-top: 14px;
+
+      border-top: 1px solid var(--border);
+    }
+
+    .clinical-annotation p {
+      margin-bottom: 0;
+      white-space: normal;
+    }
+
+    .small {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 800px) {
+      .grid,
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+
+      .title {
+        font-size: 22px;
+        padding: 22px;
+      }
+
+      .container {
+        padding: 0 12px 24px;
+      }
+    }
+  </style>
 </head>
 
 <body>
-  <div class="container">
-    <div class="title">BUSCADOR FARMACOGENÉTICO DE OPIOIDES</div>
 
-    <div class="section-title">INFORMACIÓN CLÍNICA DEL PACIENTE</div>
+  <div class="container">
+
+    <div class="title">
+      BUSCADOR FARMACOGENÉTICO DE OPIOIDES
+    </div>
+
+    <div class="section-title">
+      INFORMACIÓN CLÍNICA DEL PACIENTE
+    </div>
 
     <div class="grid">
-      <div><label for="edad">Edad</label><input id="edad" type="number" placeholder="Ej. 65"></div>
-      <div><label for="peso">Peso kg</label><input id="peso" type="number" placeholder="Ej. 70"></div>
+
+      <div>
+        <label for="edad">Edad</label>
+
+        <input
+          id="edad"
+          type="number"
+          min="0"
+          placeholder="Ej. 65"
+        >
+      </div>
+
+      <div>
+        <label for="peso">Peso kg</label>
+
+        <input
+          id="peso"
+          type="number"
+          min="0"
+          step="0.1"
+          placeholder="Ej. 70"
+        >
+      </div>
+
       <div>
         <label for="sexo">Sexo</label>
+
         <select id="sexo">
           <option value="">Seleccione</option>
-          <option>Femenino</option>
-          <option>Masculino</option>
-          <option>Otro / No especificado</option>
+          <option value="Femenino">Femenino</option>
+          <option value="Masculino">Masculino</option>
+          <option value="Otro / No especificado">
+            Otro / No especificado
+          </option>
         </select>
       </div>
+
     </div>
 
     <div class="grid-2">
+
       <div>
-        <label for="diagnostico">Diagnóstico o indicación clínica</label>
-        <textarea id="diagnostico" placeholder="Ej. dolor oncológico, dolor postoperatorio, dolor crónico..."></textarea>
+        <label for="diagnostico">
+          Diagnóstico o indicación clínica
+        </label>
+
+        <textarea
+          id="diagnostico"
+          placeholder="Ej. dolor oncológico, dolor postoperatorio, dolor crónico..."
+        ></textarea>
       </div>
+
       <div>
-        <label for="medicamentos">Medicamentos concomitantes</label>
-        <textarea id="medicamentos" placeholder="Ej. antidepresivos, benzodiacepinas, anticonvulsivantes, inhibidores CYP..."></textarea>
+        <label for="medicamentos">
+          Medicamentos concomitantes
+        </label>
+
+        <textarea
+          id="medicamentos"
+          placeholder="Ej. antidepresivos, benzodiacepinas, anticonvulsivantes, inhibidores CYP..."
+        ></textarea>
       </div>
+
     </div>
 
     <div class="grid">
+
       <div>
         <label for="renal">Función renal</label>
+
         <select id="renal">
           <option value="">Seleccione</option>
-          <option>Normal / TFG > 90</option>
-          <option>Leve / TFG 60-89</option>
-          <option>Moderada / TFG 30-59</option>
-          <option>Severa / TFG 15-29</option>
-          <option>Falla renal / TFG < 15</option>
-          <option>Desconocida</option>
+          <option value="Normal / TFG > 90">
+            Normal / TFG &gt; 90
+          </option>
+          <option value="Leve / TFG 60-89">
+            Leve / TFG 60-89
+          </option>
+          <option value="Moderada / TFG 30-59">
+            Moderada / TFG 30-59
+          </option>
+          <option value="Severa / TFG 15-29">
+            Severa / TFG 15-29
+          </option>
+          <option value="Falla renal / TFG < 15">
+            Falla renal / TFG &lt; 15
+          </option>
+          <option value="Desconocida">
+            Desconocida
+          </option>
         </select>
       </div>
 
       <div>
         <label for="hepatica">Función hepática</label>
+
         <select id="hepatica">
           <option value="">Seleccione</option>
-          <option>Normal</option>
-          <option>Alteración leve</option>
-          <option>Alteración moderada</option>
-          <option>Alteración severa</option>
-          <option>Desconocida</option>
+          <option value="Normal">Normal</option>
+          <option value="Alteración leve">
+            Alteración leve
+          </option>
+          <option value="Alteración moderada">
+            Alteración moderada
+          </option>
+          <option value="Alteración severa">
+            Alteración severa
+          </option>
+          <option value="Desconocida">
+            Desconocida
+          </option>
         </select>
       </div>
 
       <div>
         <label for="dolor">Tipo de dolor</label>
+
         <select id="dolor">
           <option value="">Seleccione</option>
-          <option>Agudo</option>
-          <option>Crónico</option>
-          <option>Oncológico</option>
-          <option>Postoperatorio</option>
-          <option>Paliativo</option>
+          <option value="Agudo">Agudo</option>
+          <option value="Crónico">Crónico</option>
+          <option value="Oncológico">Oncológico</option>
+          <option value="Postoperatorio">Postoperatorio</option>
+          <option value="Paliativo">Paliativo</option>
         </select>
       </div>
+
     </div>
 
     <div class="grid-2">
+
       <div>
         <label for="actual">Opioide actual</label>
+
         <select id="actual">
           <option value="">Seleccione</option>
-          <option>Ninguno</option>
-          <option>Codeína</option>
-          <option>Tramadol</option>
-          <option>Hidrocodona</option>
-          <option>Oxicodona</option>
-          <option>Morfina</option>
-          <option>Hidromorfona</option>
-          <option>Fentanilo</option>
-          <option>Metadona</option>
-          <option>Buprenorfina</option>
-          <option>Tapentadol</option>
+          <option value="Ninguno">Ninguno</option>
+          <option value="Codeína">Codeína</option>
+          <option value="Tramadol">Tramadol</option>
+          <option value="Hidrocodona">Hidrocodona</option>
+          <option value="Oxicodona">Oxicodona</option>
+          <option value="Morfina">Morfina</option>
+          <option value="Hidromorfona">Hidromorfona</option>
+          <option value="Fentanilo">Fentanilo</option>
+          <option value="Metadona">Metadona</option>
+          <option value="Buprenorfina">Buprenorfina</option>
+          <option value="Tapentadol">Tapentadol</option>
         </select>
       </div>
 
       <div>
-        <label for="adversos">Eventos adversos previos a opioides</label>
-        <textarea id="adversos" placeholder="Ej. náuseas, sedación, depresión respiratoria, falta de analgesia..."></textarea>
+        <label for="adversos">
+          Eventos adversos previos a opioides
+        </label>
+
+        <textarea
+          id="adversos"
+          placeholder="Ej. náuseas, sedación, depresión respiratoria, falta de analgesia..."
+        ></textarea>
       </div>
+
     </div>
 
-    <div class="section-title">CARGA DE REPORTE FARMACOGENÉTICO</div>
+    <div class="section-title">
+      CARGA DE REPORTE FARMACOGENÉTICO
+    </div>
 
     <div class="upload-box">
-      <p>Suba un reporte farmacogenético en PDF. El sistema intentará extraer genes y fenotipos relevantes para opioides.</p>
-      <input type="file" id="pdf" accept=".pdf">
-      <button onclick="leerPDF()">Leer PDF farmacogenético</button>
+
+      <p>
+        Suba un reporte farmacogenético en PDF.
+        El sistema intentará extraer genes y fenotipos
+        relevantes para opioides.
+      </p>
+
+      <input
+        type="file"
+        id="pdf"
+        accept=".pdf,application/pdf"
+      >
+
+      <button
+        type="button"
+        onclick="leerPDF()"
+      >
+        Leer PDF farmacogenético
+      </button>
+
     </div>
 
-    <div class="section-title">SELECCIÓN MANUAL FARMACOGENÉTICA</div>
+    <div class="section-title">
+      SELECCIÓN MANUAL FARMACOGENÉTICA
+    </div>
 
     <div class="grid">
+
       <div>
         <label for="farmaco">Opioide a evaluar</label>
+
         <select id="farmaco">
           <option value="">Seleccione</option>
-          <option>Codeína</option>
-          <option>Tramadol</option>
-          <option>Hidrocodona</option>
-          <option>Oxicodona</option>
-          <option>Morfina</option>
-          <option>Hidromorfona</option>
-          <option>Fentanilo</option>
-          <option>Metadona</option>
-          <option>Buprenorfina</option>
-          <option>Tapentadol</option>
+          <option value="Codeína">Codeína</option>
+          <option value="Tramadol">Tramadol</option>
+          <option value="Hidrocodona">Hidrocodona</option>
+          <option value="Oxicodona">Oxicodona</option>
+          <option value="Morfina">Morfina</option>
+          <option value="Hidromorfona">Hidromorfona</option>
+          <option value="Fentanilo">Fentanilo</option>
+          <option value="Metadona">Metadona</option>
+          <option value="Buprenorfina">Buprenorfina</option>
+          <option value="Tapentadol">Tapentadol</option>
         </select>
       </div>
 
       <div>
         <label for="gen">Gen</label>
+
         <select id="gen">
           <option value="">Seleccione</option>
-          <option>CYP2D6</option>
-          <option>CYP2B6</option>
-          <option>OPRM1</option>
-          <option>CYP3A4</option>
-          <option>CYP3A5</option>
-          <option>COMT</option>
-          <option>ABCB1</option>
+          <option value="CYP2D6">CYP2D6</option>
+          <option value="CYP2B6">CYP2B6</option>
+          <option value="OPRM1">OPRM1</option>
+          <option value="CYP3A4">CYP3A4</option>
+          <option value="CYP3A5">CYP3A5</option>
+          <option value="COMT">COMT</option>
+          <option value="ABCB1">ABCB1</option>
         </select>
       </div>
 
       <div>
         <label for="fenotipo">Fenotipo</label>
+
         <select id="fenotipo">
           <option value="">Seleccione</option>
-          <option>Metabolizador lento</option>
-          <option>Metabolizador Intermedio</option>
-          <option>Metabolizador Normal</option>
-          <option>Metabolizador Rápido</option>
-          <option>Metabolizador Ultrarápido</option>
-          <option>Desconocido</option>
+          <option value="Metabolizador lento">
+            Metabolizador lento
+          </option>
+          <option value="Metabolizador intermedio">
+            Metabolizador intermedio
+          </option>
+          <option value="Metabolizador normal">
+            Metabolizador normal
+          </option>
+          <option value="Metabolizador rápido">
+            Metabolizador rápido
+          </option>
+          <option value="Metabolizador ultrarrápido">
+            Metabolizador ultrarrápido
+          </option>
+          <option value="Desconocido">
+            Desconocido
+          </option>
         </select>
       </div>
+
     </div>
 
-    <button onclick="consultar()">Generar reporte clínico preliminar</button>
+    <button
+      id="botonConsultar"
+      type="button"
+      onclick="consultar()"
+    >
+      Generar reporte clínico preliminar
+    </button>
 
-    <div id="resultado" class="result"></div>
+    <div
+      id="resultado"
+      class="result"
+      aria-live="polite"
+    ></div>
+
   </div>
 
   <script>
@@ -396,77 +614,416 @@
       "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
     async function leerPDF() {
-      const archivo = document.getElementById("pdf").files[0];
+      const archivo =
+        document.getElementById("pdf").files[0];
 
       if (!archivo) {
-        mostrarHTML("<div class='badge-yellow'>Debe seleccionar un archivo PDF.</div>");
+        mostrarHTML(`
+          <div class="badge-yellow">
+            Debe seleccionar un archivo PDF.
+          </div>
+        `);
+
         return;
       }
 
-      const buffer = await archivo.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
+      if (archivo.type !== "application/pdf") {
+        mostrarHTML(`
+          <div class="badge-yellow">
+            El archivo seleccionado debe estar en formato PDF.
+          </div>
+        `);
 
-      let textoPDF = "";
-
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const pagina = await pdf.getPage(i);
-        const contenido = await pagina.getTextContent();
-        textoPDF += " " + contenido.items.map(item => item.str).join(" ");
+        return;
       }
 
-      analizarTextoPDF(textoPDF);
-    }
+      mostrarHTML(`
+        <div class="report-card">
+          <div class="report-title">
+            Procesando reporte farmacogenético
+          </div>
 
-    function analizarTextoPDF(texto) {
-      const t = texto.toUpperCase();
+          <p>
+            El sistema está leyendo el documento PDF.
+          </p>
+        </div>
+      `);
 
-      let fenotipoCYP2D6 = "Unknown";
+      try {
+        const buffer =
+          await archivo.arrayBuffer();
 
-      if (t.includes("CYP2D6") && t.includes("POOR METABOLIZER")) fenotipoCYP2D6 = "Poor Metabolizer";
-      if (t.includes("CYP2D6") && t.includes("INTERMEDIATE METABOLIZER")) fenotipoCYP2D6 = "Intermediate Metabolizer";
-      if (t.includes("CYP2D6") && t.includes("NORMAL METABOLIZER")) fenotipoCYP2D6 = "Normal Metabolizer";
-      if (t.includes("CYP2D6") && t.includes("RAPID METABOLIZER")) fenotipoCYP2D6 = "Rapid Metabolizer";
-      if (t.includes("CYP2D6") && t.includes("ULTRARAPID METABOLIZER")) fenotipoCYP2D6 = "Ultrarapid Metabolizer";
+        const pdf =
+          await pdfjsLib
+            .getDocument({ data: buffer })
+            .promise;
 
-      mostrarHTML(generarReporte(fenotipoCYP2D6, true));
-    }
+        let textoPDF = "";
 
-    function consultar() {
-      const fenotipo = document.getElementById("fenotipo").value || "Unknown";
-      mostrarHTML(generarReporte(fenotipo, false));
-    }
+        for (
+          let numeroPagina = 1;
+          numeroPagina <= pdf.numPages;
+          numeroPagina++
+        ) {
+          const pagina =
+            await pdf.getPage(numeroPagina);
 
-    function generarReporte(fenotipoCYP2D6, desdePDF) {
-      let recomendados = ["Morfina", "Hidromorfona"];
-      let precaucion = ["Hidrocodona", "Oxicodona"];
-      let evitar = [];
+          const contenido =
+            await pagina.getTextContent();
 
-      if (fenotipoCYP2D6 === "Poor Metabolizer" || fenotipoCYP2D6 === "Ultrarapid Metabolizer") {
-        evitar = ["Codeína", "Tramadol"];
-      } else if (fenotipoCYP2D6 === "Intermediate Metabolizer") {
-        precaucion.unshift("Codeína", "Tramadol");
-      } else {
-        precaucion.push("Codeína", "Tramadol");
+          const textoPagina =
+            contenido.items
+              .map(item => item.str)
+              .join(" ");
+
+          textoPDF += ` ${textoPagina}`;
+        }
+
+        if (!textoPDF.trim()) {
+          mostrarHTML(`
+            <div class="badge-yellow">
+              No fue posible extraer texto del PDF.
+              El documento podría contener únicamente imágenes.
+            </div>
+          `);
+
+          return;
+        }
+
+        await analizarTextoPDF(textoPDF);
+
+      } catch (error) {
+        mostrarHTML(`
+          <div class="badge-red">
+            No fue posible procesar el archivo PDF.
+          </div>
+
+          <p class="small">
+            ${escaparHTML(error.message)}
+          </p>
+        `);
       }
+    }
+
+    async function analizarTextoPDF(texto) {
+      const textoNormalizado =
+        normalizarTexto(texto);
+
+      const genDetectado =
+        detectarGen(textoNormalizado);
+
+      const fenotipoDetectado =
+        detectarFenotipo(textoNormalizado);
+
+      if (genDetectado) {
+        document.getElementById("gen").value =
+          genDetectado;
+      }
+
+      if (fenotipoDetectado !== "Desconocido") {
+        document.getElementById("fenotipo").value =
+          fenotipoDetectado;
+      }
+
+      const farmacoVisible =
+        document.getElementById("farmaco").value;
+
+      if (!farmacoVisible) {
+        mostrarHTML(`
+          <div class="report-card">
+            <div class="report-title">
+              Reporte farmacogenético leído
+            </div>
+
+            <span class="badge-green">
+              El documento fue procesado correctamente.
+            </span>
+
+            <strong>Gen detectado:</strong>
+            ${escaparHTML(genDetectado || "No identificado")}
+            <br>
+
+            <strong>Fenotipo detectado:</strong>
+            ${escaparHTML(fenotipoDetectado)}
+            <br><br>
+
+            <span class="badge-yellow">
+              Seleccione ahora el opioide que desea evaluar
+              y pulse “Generar reporte clínico preliminar”.
+            </span>
+          </div>
+        `);
+
+        return;
+      }
+
+      await generarReporteCompleto({
+        farmacoVisible,
+        gen: genDetectado ||
+          document.getElementById("gen").value,
+
+        fenotipo: fenotipoDetectado,
+        desdePDF: true
+      });
+    }
+
+    async function consultar() {
+      const farmacoVisible =
+        document.getElementById("farmaco").value;
+
+      const gen =
+        document.getElementById("gen").value;
+
+      const fenotipo =
+        document.getElementById("fenotipo").value ||
+        "Desconocido";
+
+      if (!farmacoVisible) {
+        mostrarHTML(`
+          <div class="badge-yellow">
+            Debe seleccionar el opioide que desea evaluar.
+          </div>
+        `);
+
+        return;
+      }
+
+      if (!gen) {
+        mostrarHTML(`
+          <div class="badge-yellow">
+            Debe seleccionar el gen que desea consultar.
+          </div>
+        `);
+
+        return;
+      }
+
+      await generarReporteCompleto({
+        farmacoVisible,
+        gen,
+        fenotipo,
+        desdePDF: false
+      });
+    }
+
+    async function generarReporteCompleto({
+      farmacoVisible,
+      gen,
+      fenotipo,
+      desdePDF
+    }) {
+      const boton =
+        document.getElementById("botonConsultar");
+
+      boton.disabled = true;
+      boton.textContent =
+        "Consultando evidencia...";
+
+      mostrarHTML(`
+        <div class="report-card">
+          <div class="report-title">
+            Consultando evidencia farmacogenética
+          </div>
+
+          <p>
+            Buscando información para
+            <strong>${escaparHTML(farmacoVisible)}</strong>
+            y
+            <strong>${escaparHTML(gen)}</strong>
+            en ClinPGx.
+          </p>
+        </div>
+      `);
+
+      try {
+        const resultadoAPI =
+          await consultarClinPGx(
+            farmacoVisible,
+            gen
+          );
+
+        const reporteLocal =
+          generarReporteLocal(
+            fenotipo,
+            desdePDF,
+            farmacoVisible,
+            gen
+          );
+
+        const evidenciaClinPGx =
+          generarTarjetaClinPGx(
+            resultadoAPI,
+            farmacoVisible,
+            gen
+          );
+
+        mostrarHTML(
+          reporteLocal +
+          evidenciaClinPGx +
+          generarAdvertenciaFinal()
+        );
+
+      } catch (error) {
+        const reporteLocal =
+          generarReporteLocal(
+            fenotipo,
+            desdePDF,
+            farmacoVisible,
+            gen
+          );
+
+        mostrarHTML(`
+          ${reporteLocal}
+
+          <div class="report-card">
+            <div class="report-title">
+              7. Consulta de evidencia externa
+            </div>
+
+            <span class="badge-yellow">
+              El reporte clínico preliminar fue generado,
+              pero no fue posible recuperar en este momento
+              la evidencia externa de ClinPGx.
+            </span>
+
+            <p class="small">
+              ${escaparHTML(error.message)}
+            </p>
+          </div>
+
+          ${generarAdvertenciaFinal()}
+        `);
+
+      } finally {
+        boton.disabled = false;
+        boton.textContent =
+          "Generar reporte clínico preliminar";
+      }
+    }
+
+    async function consultarClinPGx(
+      farmacoVisible,
+      gen
+    ) {
+      const farmacoAPI =
+        convertirFarmacoParaAPI(
+          farmacoVisible
+        );
+
+      const parametros =
+        new URLSearchParams({
+          drug: farmacoAPI
+        });
+
+      if (gen) {
+        parametros.set("gene", gen);
+      }
+
+      const respuesta =
+        await fetch(
+          `/api/clinpgx?${parametros.toString()}`
+        );
+
+      let resultadoAPI;
+
+      try {
+        resultadoAPI =
+          await respuesta.json();
+
+      } catch {
+        throw new Error(
+          "La API respondió con un formato no válido."
+        );
+      }
+
+      if (!respuesta.ok) {
+        throw new Error(
+          resultadoAPI.error ||
+          resultadoAPI.detail ||
+          `Error HTTP ${respuesta.status}`
+        );
+      }
+
+      return resultadoAPI;
+    }
+
+    function generarReporteLocal(
+      fenotipo,
+      desdePDF,
+      farmacoVisible,
+      gen
+    ) {
+      const clasificacion =
+        clasificarOpioides(
+          fenotipo,
+          gen
+        );
 
       let html = "";
 
       html += `
         <div class="report-card">
-          <div class="report-title">1. Resumen ejecutivo para apoyo a la decisión clínica</div>
-          <span class="badge-green">Opioides preferidos o con menor dependencia de CYP2D6: ${recomendados.join(", ")}</span>
-          <span class="badge-yellow">Usar con precaución: ${precaucion.join(", ")}</span>
-          <span class="badge-red">Considerar evitar: ${evitar.length ? evitar.join(", ") : "No definido en esta evaluación preliminar"}</span>
+          <div class="report-title">
+            1. Resumen ejecutivo para apoyo
+            a la decisión clínica
+          </div>
+
+          <span class="badge-green">
+            Opioides preferidos o con menor dependencia
+            de CYP2D6:
+            ${escaparHTML(
+              clasificacion.recomendados.join(", ")
+            )}
+          </span>
+
+          <span class="badge-yellow">
+            Usar con precaución:
+            ${escaparHTML(
+              clasificacion.precaucion.length
+                ? clasificacion.precaucion.join(", ")
+                : "No definido"
+            )}
+          </span>
+
+          <span class="badge-red">
+            Considerar evitar:
+            ${escaparHTML(
+              clasificacion.evitar.length
+                ? clasificacion.evitar.join(", ")
+                : "No definido en esta evaluación preliminar"
+            )}
+          </span>
         </div>
       `;
 
       html += `
         <div class="report-card">
-          <div class="report-title">2. Perfil farmacogenético relevante</div>
-          <strong>Fuente:</strong> ${desdePDF ? "PDF farmacogenético cargado" : "Selección manual"}<br>
-          <strong>Gen principal:</strong> CYP2D6<br>
-          <strong>Fenotipo detectado/seleccionado:</strong> ${fenotipoCYP2D6}<br>
-          <strong>Implicación clínica:</strong> CYP2D6 puede modificar la activación de codeína y tramadol, y puede influir parcialmente en la respuesta a hidrocodona y oxicodona.
+          <div class="report-title">
+            2. Perfil farmacogenético relevante
+          </div>
+
+          <strong>Fuente del fenotipo:</strong>
+          ${
+            desdePDF
+              ? "PDF farmacogenético cargado"
+              : "Selección manual"
+          }
+          <br>
+
+          <strong>Opioide evaluado:</strong>
+          ${escaparHTML(farmacoVisible)}
+          <br>
+
+          <strong>Gen consultado:</strong>
+          ${escaparHTML(gen || "No especificado")}
+          <br>
+
+          <strong>Fenotipo detectado o seleccionado:</strong>
+          ${escaparHTML(fenotipo)}
+          <br><br>
+
+          <strong>Implicación clínica preliminar:</strong>
+          ${generarImplicacionGen(gen)}
         </div>
       `;
 
@@ -474,23 +1031,33 @@
 
       html += `
         <div class="report-card">
-          <div class="report-title">4. Acción clínica sugerida</div>
-          ${accionClinica(fenotipoCYP2D6)}
+          <div class="report-title">
+            4. Acción clínica sugerida
+          </div>
+
+          <p>
+            ${accionClinica(
+              fenotipo,
+              gen,
+              farmacoVisible
+            )}
+          </p>
         </div>
       `;
 
       html += `
         <div class="report-card">
-          <div class="report-title">5. Evidencia y fuentes clínicas</div>
-          Interpretación preliminar basada en reglas locales derivadas de principios farmacogenéticos usados por CPIC, PharmGKB, DPWG y ClinPGx. La próxima versión conectará bases de datos externas para recuperar recomendaciones actualizadas.
-        </div>
-      `;
+          <div class="report-title">
+            5. Interpretación clínica preliminar
+          </div>
 
-      html += `
-        <div class="report-card">
-          <div class="report-title">6. Advertencia</div>
-          <p class="small">
-          Esta herramienta es un prototipo de apoyo a la decisión clínica. No reemplaza el criterio médico, la revisión farmacológica integral, la historia clínica ni las guías clínicas completas. Toda recomendación debe ser validada por un profesional de salud.
+          <p>
+            La selección del opioide no debe fundamentarse
+            únicamente en el genotipo o fenotipo farmacogenético.
+            Deben integrarse la intensidad y el tipo de dolor,
+            la función renal y hepática, la edad, el tratamiento
+            concomitante, las interacciones farmacológicas,
+            la respuesta previa y los eventos adversos.
           </p>
         </div>
       `;
@@ -498,62 +1065,699 @@
       return html;
     }
 
+    function clasificarOpioides(
+      fenotipo,
+      gen
+    ) {
+      const fenotipoNormalizado =
+        normalizarTexto(fenotipo);
+
+      let recomendados = [
+        "Morfina",
+        "Hidromorfona"
+      ];
+
+      let precaucion = [
+        "Hidrocodona",
+        "Oxicodona"
+      ];
+
+      let evitar = [];
+
+      if (gen !== "CYP2D6") {
+        return {
+          recomendados,
+          precaucion: [
+            ...precaucion,
+            "Codeína",
+            "Tramadol"
+          ],
+          evitar
+        };
+      }
+
+      if (
+        fenotipoNormalizado.includes(
+          "METABOLIZADOR LENTO"
+        ) ||
+        fenotipoNormalizado.includes(
+          "POOR METABOLIZER"
+        )
+      ) {
+        evitar = [
+          "Codeína",
+          "Tramadol"
+        ];
+      } else if (
+        fenotipoNormalizado.includes(
+          "METABOLIZADOR ULTRARRAPIDO"
+        ) ||
+        fenotipoNormalizado.includes(
+          "ULTRARAPID METABOLIZER"
+        )
+      ) {
+        evitar = [
+          "Codeína",
+          "Tramadol"
+        ];
+      } else if (
+        fenotipoNormalizado.includes(
+          "METABOLIZADOR INTERMEDIO"
+        ) ||
+        fenotipoNormalizado.includes(
+          "INTERMEDIATE METABOLIZER"
+        )
+      ) {
+        precaucion = [
+          "Codeína",
+          "Tramadol",
+          ...precaucion
+        ];
+      } else {
+        precaucion = [
+          ...precaucion,
+          "Codeína",
+          "Tramadol"
+        ];
+      }
+
+      return {
+        recomendados,
+        precaucion:
+          [...new Set(precaucion)],
+
+        evitar:
+          [...new Set(evitar)]
+      };
+    }
+
     function resumenPaciente() {
-      const edad = document.getElementById("edad").value || "No registrada";
-      const peso = document.getElementById("peso").value || "No registrado";
-      const sexo = document.getElementById("sexo").value || "No registrado";
-      const diagnostico = document.getElementById("diagnostico").value || "No registrado";
-      const renal = document.getElementById("renal").value || "No registrada";
-      const hepatica = document.getElementById("hepatica").value || "No registrada";
-      const dolor = document.getElementById("dolor").value || "No registrado";
-      const actual = document.getElementById("actual").value || "No registrado";
-      const medicamentos = document.getElementById("medicamentos").value || "No registrados";
-      const adversos = document.getElementById("adversos").value || "No registrados";
+      const edad =
+        document.getElementById("edad").value ||
+        "No registrada";
+
+      const peso =
+        document.getElementById("peso").value ||
+        "No registrado";
+
+      const sexo =
+        document.getElementById("sexo").value ||
+        "No registrado";
+
+      const diagnostico =
+        document.getElementById("diagnostico").value ||
+        "No registrado";
+
+      const renal =
+        document.getElementById("renal").value ||
+        "No registrada";
+
+      const hepatica =
+        document.getElementById("hepatica").value ||
+        "No registrada";
+
+      const dolor =
+        document.getElementById("dolor").value ||
+        "No registrado";
+
+      const actual =
+        document.getElementById("actual").value ||
+        "No registrado";
+
+      const medicamentos =
+        document.getElementById("medicamentos").value ||
+        "No registrados";
+
+      const adversos =
+        document.getElementById("adversos").value ||
+        "No registrados";
 
       let alertas = "";
 
-      if (Number(edad) > 65) alertas += "<span class='badge-yellow'>Paciente mayor de 65 años: considerar riesgo aumentado de sedación, caídas y eventos adversos.</span>";
-      if (renal.includes("Moderada") || renal.includes("Severa") || renal.includes("Falla")) alertas += "<span class='badge-yellow'>Función renal alterada: considerar ajuste, vigilancia o selección cuidadosa del opioide.</span>";
-      if (hepatica.includes("moderada") || hepatica.includes("severa") || hepatica.includes("Alteración moderada") || hepatica.includes("Alteración severa")) alertas += "<span class='badge-yellow'>Función hepática alterada: considerar metabolismo del opioide y vigilancia clínica.</span>";
-      if (medicamentos !== "No registrados") alertas += "<span class='badge-yellow'>Medicamentos concomitantes: revisar depresores del sistema nervioso central e inhibidores/inductores CYP.</span>";
-      if (adversos !== "No registrados") alertas += "<span class='badge-yellow'>Eventos adversos previos: considerar historia de tolerabilidad antes de seleccionar opioide.</span>";
+      if (
+        edad !== "No registrada" &&
+        Number(edad) >= 65
+      ) {
+        alertas += `
+          <span class="badge-yellow">
+            Paciente de 65 años o más:
+            considerar mayor riesgo de sedación,
+            caídas y eventos adversos.
+          </span>
+        `;
+      }
+
+      if (
+        renal.includes("Moderada") ||
+        renal.includes("Severa") ||
+        renal.includes("Falla")
+      ) {
+        alertas += `
+          <span class="badge-yellow">
+            Función renal alterada:
+            considerar ajuste, vigilancia o selección
+            cuidadosa del opioide.
+          </span>
+        `;
+      }
+
+      if (
+        hepatica.includes("moderada") ||
+        hepatica.includes("severa")
+      ) {
+        alertas += `
+          <span class="badge-yellow">
+            Función hepática alterada:
+            considerar metabolismo del opioide,
+            reducción de dosis y vigilancia clínica.
+          </span>
+        `;
+      }
+
+      if (
+        medicamentos !== "No registrados"
+      ) {
+        alertas += `
+          <span class="badge-yellow">
+            Revisar medicamentos concomitantes,
+            especialmente depresores del sistema
+            nervioso central e inhibidores o inductores
+            de enzimas CYP.
+          </span>
+        `;
+      }
+
+      if (
+        adversos !== "No registrados"
+      ) {
+        alertas += `
+          <span class="badge-yellow">
+            Existen eventos adversos previos:
+            revisar tolerabilidad y exposición previa
+            antes de seleccionar el opioide.
+          </span>
+        `;
+      }
 
       return `
         <div class="report-card">
-          <div class="report-title">3. Factores clínicos del paciente</div>
-          <strong>Edad:</strong> ${edad}<br>
-          <strong>Peso:</strong> ${peso} kg<br>
-          <strong>Sexo:</strong> ${sexo}<br>
-          <strong>Diagnóstico:</strong> ${diagnostico}<br>
-          <strong>Tipo de dolor:</strong> ${dolor}<br>
-          <strong>Función renal:</strong> ${renal}<br>
-          <strong>Función hepática:</strong> ${hepatica}<br>
-          <strong>Opioide actual:</strong> ${actual}<br>
-          <strong>Medicamentos concomitantes:</strong> ${medicamentos}<br>
-          <strong>Eventos adversos previos:</strong> ${adversos}<br><br>
-          ${alertas || "<span class='badge-green'>No se generaron alertas clínicas adicionales con los datos ingresados.</span>"}
+          <div class="report-title">
+            3. Factores clínicos del paciente
+          </div>
+
+          <strong>Edad:</strong>
+          ${escaparHTML(edad)}
+          <br>
+
+          <strong>Peso:</strong>
+          ${escaparHTML(peso)}
+          ${
+            peso !== "No registrado"
+              ? " kg"
+              : ""
+          }
+          <br>
+
+          <strong>Sexo:</strong>
+          ${escaparHTML(sexo)}
+          <br>
+
+          <strong>Diagnóstico:</strong>
+          ${escaparHTML(diagnostico)}
+          <br>
+
+          <strong>Tipo de dolor:</strong>
+          ${escaparHTML(dolor)}
+          <br>
+
+          <strong>Función renal:</strong>
+          ${escaparHTML(renal)}
+          <br>
+
+          <strong>Función hepática:</strong>
+          ${escaparHTML(hepatica)}
+          <br>
+
+          <strong>Opioide actual:</strong>
+          ${escaparHTML(actual)}
+          <br>
+
+          <strong>Medicamentos concomitantes:</strong>
+          ${escaparHTML(medicamentos)}
+          <br>
+
+          <strong>Eventos adversos previos:</strong>
+          ${escaparHTML(adversos)}
+          <br><br>
+
+          ${
+            alertas ||
+            `
+              <span class="badge-green">
+                No se generaron alertas clínicas adicionales
+                con los datos ingresados.
+              </span>
+            `
+          }
         </div>
       `;
     }
 
-    function accionClinica(fenotipo) {
-      if (fenotipo === "Metabolizador Lento") {
-        return "Evitar codeína y tramadol por posible falta de eficacia analgésica. Considerar morfina o hidromorfona, integrando función renal, función hepática, edad, comorbilidades e interacciones.";
+    function accionClinica(
+      fenotipo,
+      gen,
+      farmacoVisible
+    ) {
+      const f =
+        normalizarTexto(fenotipo);
+
+      if (gen !== "CYP2D6") {
+        return `
+          Para ${escaparHTML(farmacoVisible)},
+          la interpretación específica de ${escaparHTML(gen)}
+          debe contrastarse con la anotación recuperada de
+          ClinPGx y con una guía clínica aplicable.
+          No se genera una modificación automática de dosis
+          en esta versión del prototipo.
+        `;
       }
-      if (fenotipo === "Metabolizador Intermedio") {
-        return "Usar codeína y tramadol con precaución por posible respuesta analgésica reducida. Considerar alternativa como morfina o hidromorfona si hay dolor moderado-severo, respuesta insuficiente o factores clínicos de riesgo.";
+
+      if (
+        f.includes("METABOLIZADOR LENTO") ||
+        f.includes("POOR METABOLIZER")
+      ) {
+        return `
+          Considerar evitar codeína y tramadol por
+          posible reducción de la formación de metabolitos
+          activos y menor eficacia analgésica.
+          Evaluar una alternativa con menor dependencia de
+          CYP2D6, integrando función renal, función hepática,
+          edad, comorbilidades e interacciones.
+        `;
       }
-      if (fenotipo === "Metabolizador Ultrarápido") {
-        return "Considerar evitar codeína y tramadol por riesgo aumentado de toxicidad relacionada con conversión rápida a metabolitos activos.";
+
+      if (
+        f.includes("METABOLIZADOR INTERMEDIO") ||
+        f.includes("INTERMEDIATE METABOLIZER")
+      ) {
+        return `
+          Usar codeína y tramadol con precaución por
+          posible respuesta analgésica reducida.
+          Valorar una alternativa si existe respuesta
+          insuficiente, dolor moderado o severo,
+          o factores clínicos adicionales de riesgo.
+        `;
       }
-      return "No se identificó una alerta farmacogenética fuerte para CYP2D6 en esta versión preliminar. Mantener evaluación clínica, vigilancia de eficacia, eventos adversos e interacciones.";
+
+      if (
+        f.includes("METABOLIZADOR ULTRARRAPIDO") ||
+        f.includes("ULTRARAPID METABOLIZER")
+      ) {
+        return `
+          Considerar evitar codeína y tramadol por
+          mayor conversión a metabolitos activos y
+          posible aumento del riesgo de toxicidad.
+        `;
+      }
+
+      if (
+        f.includes("METABOLIZADOR RAPIDO") ||
+        f.includes("RAPID METABOLIZER")
+      ) {
+        return `
+          Interpretar con precaución el posible aumento
+          de actividad metabólica.
+          Vigilar eficacia y toxicidad y contrastar con
+          la recomendación clínica específica recuperada
+          de ClinPGx.
+        `;
+      }
+
+      if (
+        f.includes("METABOLIZADOR NORMAL") ||
+        f.includes("NORMAL METABOLIZER")
+      ) {
+        return `
+          No se identifica una alerta farmacogenética
+          fuerte por fenotipo CYP2D6 en esta evaluación.
+          Mantener la vigilancia de eficacia, sedación,
+          eventos adversos e interacciones farmacológicas.
+        `;
+      }
+
+      return `
+        El fenotipo es desconocido o no fue especificado.
+        No debe generarse una recomendación farmacogenética
+        definitiva hasta confirmar el resultado del genotipo
+        o fenotipo y revisar la evidencia clínica aplicable.
+      `;
+    }
+
+    function generarImplicacionGen(gen) {
+      const implicaciones = {
+        CYP2D6:
+          "CYP2D6 puede modificar la activación de codeína y tramadol y puede influir parcialmente en la respuesta a hidrocodona y oxicodona.",
+
+        CYP2B6:
+          "CYP2B6 participa en el metabolismo de algunos opioides, especialmente metadona, aunque la implicación clínica depende del fármaco, la variante y la guía utilizada.",
+
+        OPRM1:
+          "OPRM1 codifica el receptor opioide μ y algunas variantes pueden relacionarse con diferencias en analgesia o requerimientos de dosis, aunque la utilidad clínica puede ser limitada o dependiente del contexto.",
+
+        CYP3A4:
+          "CYP3A4 participa en el metabolismo de varios opioides y su actividad puede modificarse de manera importante por inhibidores e inductores farmacológicos.",
+
+        CYP3A5:
+          "CYP3A5 puede contribuir al metabolismo de determinados opioides, pero su relevancia clínica depende de la variante, el medicamento y la evidencia disponible.",
+
+        COMT:
+          "COMT participa en vías relacionadas con percepción del dolor y respuesta analgésica, aunque su aplicación clínica rutinaria requiere interpretación cuidadosa.",
+
+        ABCB1:
+          "ABCB1 codifica una proteína transportadora que puede influir en distribución y exposición a algunos opioides, con evidencia clínica variable."
+      };
+
+      return implicaciones[gen] ||
+        "La implicación clínica del gen seleccionado debe interpretarse según el medicamento y la evidencia disponible.";
+    }
+
+    function generarTarjetaClinPGx(
+      resultadoAPI,
+      farmacoVisible,
+      gen
+    ) {
+      const registros =
+        extraerRegistrosClinPGx(
+          resultadoAPI.data
+        );
+
+      if (!registros.length) {
+        return `
+          <div class="report-card">
+            <div class="report-title">
+              6. Evidencia recuperada de ClinPGx
+            </div>
+
+            <strong>Medicamento:</strong>
+            ${escaparHTML(farmacoVisible)}
+            <br>
+
+            <strong>Gen consultado:</strong>
+            ${escaparHTML(gen || "No especificado")}
+            <br><br>
+
+            <span class="badge-yellow">
+              La consulta fue completada, pero no se
+              encontraron anotaciones clínicas para
+              esta combinación.
+            </span>
+          </div>
+        `;
+      }
+
+      const limite = 5;
+
+      const registrosMostrados =
+        registros.slice(0, limite);
+
+      const anotaciones =
+        registrosMostrados
+          .map((registro, indice) => {
+            const alelo =
+              registro.allele ||
+              registro.name ||
+              registro.accessionId ||
+              registro.id ||
+              `Anotación ${indice + 1}`;
+
+            const texto =
+              registro.phenotype ||
+              registro.annotation ||
+              registro.description ||
+              registro.text ||
+              "ClinPGx devolvió una anotación sin descripción textual.";
+
+            const evidenciaLimitada =
+              registro.limitedEvidence === true
+                ? `
+                    <span class="badge-yellow">
+                      Evidencia marcada como limitada
+                      en el registro consultado.
+                    </span>
+                  `
+                : "";
+
+            return `
+              <div class="clinical-annotation">
+
+                <strong>
+                  ${escaparHTML(String(alelo))}
+                </strong>
+
+                ${evidenciaLimitada}
+
+                <p>
+                  ${escaparHTML(String(texto))}
+                </p>
+
+              </div>
+            `;
+          })
+          .join("");
+
+      return `
+        <div class="report-card">
+          <div class="report-title">
+            6. Evidencia recuperada de ClinPGx
+          </div>
+
+          <strong>Fuente:</strong>
+          ${escaparHTML(
+            resultadoAPI.source || "ClinPGx"
+          )}
+          <br>
+
+          <strong>Medicamento:</strong>
+          ${escaparHTML(farmacoVisible)}
+          <br>
+
+          <strong>Gen consultado:</strong>
+          ${escaparHTML(gen || "No especificado")}
+          <br>
+
+          <strong>Anotaciones encontradas:</strong>
+          ${registros.length}
+          <br>
+
+          ${anotaciones}
+
+          ${
+            registros.length > limite
+              ? `
+                  <p class="small">
+                    Se muestran ${limite} de
+                    ${registros.length}
+                    anotaciones recuperadas.
+                  </p>
+                `
+              : ""
+          }
+
+          <p class="small">
+            El texto mostrado corresponde a anotaciones
+            recuperadas desde ClinPGx y no constituye por sí
+            solo una prescripción ni una recomendación clínica
+            definitiva.
+          </p>
+        </div>
+      `;
+    }
+
+    function extraerRegistrosClinPGx(
+      contenido
+    ) {
+      if (!contenido) {
+        return [];
+      }
+
+      if (Array.isArray(contenido)) {
+        return contenido;
+      }
+
+      if (
+        contenido.data &&
+        Array.isArray(contenido.data)
+      ) {
+        return contenido.data;
+      }
+
+      if (
+        contenido.data &&
+        contenido.data.data &&
+        Array.isArray(contenido.data.data)
+      ) {
+        return contenido.data.data;
+      }
+
+      if (
+        contenido.results &&
+        Array.isArray(contenido.results)
+      ) {
+        return contenido.results;
+      }
+
+      return [];
+    }
+
+    function detectarGen(textoNormalizado) {
+      const genes = [
+        "CYP2D6",
+        "CYP2B6",
+        "OPRM1",
+        "CYP3A4",
+        "CYP3A5",
+        "COMT",
+        "ABCB1"
+      ];
+
+      return genes.find(
+        gen => textoNormalizado.includes(gen)
+      ) || "";
+    }
+
+    function detectarFenotipo(
+      textoNormalizado
+    ) {
+      const reglas = [
+        {
+          expresiones: [
+            "ULTRARAPID METABOLIZER",
+            "ULTRA RAPID METABOLIZER",
+            "METABOLIZADOR ULTRARRAPIDO",
+            "METABOLIZADOR ULTRA RAPIDO"
+          ],
+          valor: "Metabolizador ultrarrápido"
+        },
+        {
+          expresiones: [
+            "POOR METABOLIZER",
+            "METABOLIZADOR LENTO"
+          ],
+          valor: "Metabolizador lento"
+        },
+        {
+          expresiones: [
+            "INTERMEDIATE METABOLIZER",
+            "METABOLIZADOR INTERMEDIO"
+          ],
+          valor: "Metabolizador intermedio"
+        },
+        {
+          expresiones: [
+            "NORMAL METABOLIZER",
+            "EXTENSIVE METABOLIZER",
+            "METABOLIZADOR NORMAL"
+          ],
+          valor: "Metabolizador normal"
+        },
+        {
+          expresiones: [
+            "RAPID METABOLIZER",
+            "METABOLIZADOR RAPIDO"
+          ],
+          valor: "Metabolizador rápido"
+        }
+      ];
+
+      for (const regla of reglas) {
+        const encontrado =
+          regla.expresiones.some(
+            expresion =>
+              textoNormalizado.includes(
+                expresion
+              )
+          );
+
+        if (encontrado) {
+          return regla.valor;
+        }
+      }
+
+      return "Desconocido";
+    }
+
+    function convertirFarmacoParaAPI(
+      farmaco
+    ) {
+      const equivalencias = {
+        "Codeína": "codeine",
+        "Tramadol": "tramadol",
+        "Hidrocodona": "hydrocodone",
+        "Oxicodona": "oxycodone",
+        "Morfina": "morphine",
+        "Hidromorfona": "hydromorphone",
+        "Fentanilo": "fentanyl",
+        "Metadona": "methadone",
+        "Buprenorfina": "buprenorphine",
+        "Tapentadol": "tapentadol"
+      };
+
+      return equivalencias[farmaco] ||
+        farmaco;
+    }
+
+    function generarAdvertenciaFinal() {
+      return `
+        <div class="report-card">
+          <div class="report-title">
+            7. Advertencia
+          </div>
+
+          <p class="small">
+            Esta herramienta es un prototipo de apoyo
+            a la decisión clínica. No reemplaza el criterio
+            médico, la revisión farmacológica integral,
+            la historia clínica, la confirmación del resultado
+            farmacogenético ni las guías clínicas completas.
+            Toda recomendación debe ser evaluada y validada
+            por un profesional de la salud.
+          </p>
+        </div>
+      `;
+    }
+
+    function normalizarTexto(valor) {
+      return String(valor || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toUpperCase()
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function escaparHTML(valor) {
+      return String(valor ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
     }
 
     function mostrarHTML(html) {
-      const resultado = document.getElementById("resultado");
+      const resultado =
+        document.getElementById("resultado");
+
       resultado.style.display = "block";
       resultado.innerHTML = html;
+
+      resultado.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
     }
   </script>
+
 </body>
 </html>
+         
