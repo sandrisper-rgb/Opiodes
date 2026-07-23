@@ -255,6 +255,23 @@
       color: var(--muted);
     }
 
+    .annotation-summary {
+      margin-top: 12px;
+      line-height: 1.6;
+    }
+
+    .annotation-summary strong {
+      color: var(--navy);
+    }
+
+    .annotation-summary .interpretation-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #f3f8fb;
+      border: 1px solid var(--border);
+    }
+
 
     .chart-card {
       background: #ffffff;
@@ -748,9 +765,7 @@
             <canvas id="graficaRelevancia"></canvas>
           </div>
           <p class="legend-note">
-            La puntuación resume la evidencia recuperada: 4 = guía accionable,
-            3 = etiqueta o evidencia clínica relevante, 2 = evidencia limitada,
-            1 = informativa y 0 = sin evidencia recuperada.
+            La gráfica muestra únicamente genes con evidencia específica para el opioide seleccionado: 4 = par gen–medicamento accionable validado; 3 = guía o etiqueta específica; 2 = anotación clínica específica.
           </p>
         </div>
 
@@ -1054,16 +1069,16 @@
                       `Registro ${indice + 1}`;
 
                     const texto =
-                      registro.phenotype ||
-                      registro.annotation ||
-                      registro.description ||
-                      registro.text ||
-                      resumirObjeto(registro);
+                      resumenRegistroEnEspanol(
+                        registro,
+                        gen,
+                        titulo
+                      );
 
                     return `
                       <details>
                         <summary>${escaparHTML(String(encabezado))}</summary>
-                        <p>${escaparHTML(String(texto))}</p>
+                        <div class="annotation-summary">${texto}</div>
                       </details>
                     `;
                   }).join("")
@@ -1167,6 +1182,174 @@
       };
 
       return mapa[farmaco] || farmaco;
+    }
+
+    function resumenRegistroEnEspanol(
+      registro,
+      gen,
+      tipoSeccion
+    ) {
+      const textoCompleto =
+        JSON.stringify(registro || {});
+
+      const textoNormalizado =
+        normalizarTexto(textoCompleto);
+
+      const variante =
+        registro.name ||
+        registro.allele ||
+        registro.accessionId ||
+        registro.id ||
+        "No identificada";
+
+      const nivel =
+        obtenerNivelEvidencia(registro);
+
+      const medicamento =
+        document.getElementById("farmaco").value ||
+        "medicamento seleccionado";
+
+      let resumen =
+        "ClinPGx reporta información farmacogenética relacionada con este registro.";
+
+      let interpretacion =
+        "La información es de apoyo y no debe utilizarse por sí sola para modificar la dosis o el tratamiento.";
+
+      if (
+        textoNormalizado.includes("DECREASED") &&
+        textoNormalizado.includes("DOSE REQUIREMENTS")
+      ) {
+        resumen =
+          `Algunos estudios sugieren que esta variante puede asociarse con menores requerimientos de dosis de ${medicamento}.`;
+      }
+
+      if (
+        textoNormalizado.includes("INCREASED") &&
+        textoNormalizado.includes("DOSE REQUIREMENTS")
+      ) {
+        resumen =
+          `Algunos estudios sugieren que esta variante puede asociarse con mayores requerimientos de dosis de ${medicamento}.`;
+      }
+
+      if (
+        textoNormalizado.includes("DECREASED METABOLISM")
+      ) {
+        resumen =
+          `Esta variante puede asociarse con una disminución del metabolismo de ${medicamento}.`;
+      }
+
+      if (
+        textoNormalizado.includes("INCREASED METABOLISM")
+      ) {
+        resumen =
+          `Esta variante puede asociarse con un aumento del metabolismo de ${medicamento}.`;
+      }
+
+      if (
+        textoNormalizado.includes("DECREASED RESPONSE") ||
+        textoNormalizado.includes("REDUCED RESPONSE")
+      ) {
+        resumen =
+          `Esta variante puede asociarse con una respuesta reducida a ${medicamento}.`;
+      }
+
+      if (
+        textoNormalizado.includes("INCREASED RESPONSE")
+      ) {
+        resumen =
+          `Esta variante puede asociarse con una respuesta aumentada a ${medicamento}.`;
+      }
+
+      if (
+        textoNormalizado.includes("DID NOT FIND AN ASSOCIATION") ||
+        textoNormalizado.includes("CONFLICTING") ||
+        textoNormalizado.includes("INCONSISTENT")
+      ) {
+        resumen +=
+          " Sin embargo, la evidencia es inconsistente y otros estudios no encontraron la misma asociación.";
+
+        interpretacion =
+          "Evidencia limitada o contradictoria. No realizar ajustes automáticos de dosis.";
+      }
+
+      if (
+        textoNormalizado.includes("AVOID") ||
+        textoNormalizado.includes("ALTERNATIVE") ||
+        textoNormalizado.includes("ADJUST DOSE") ||
+        textoNormalizado.includes("REDUCE DOSE") ||
+        textoNormalizado.includes("INCREASE DOSE")
+      ) {
+        interpretacion =
+          "Puede existir una recomendación clínica específica. Debe verificarse directamente en la guía o etiqueta correspondiente antes de tomar decisiones.";
+      }
+
+      if (
+        String(tipoSeccion).toLowerCase().includes("guía")
+      ) {
+        interpretacion =
+          "Existe una guía farmacogenética relacionada. La recomendación concreta debe revisarse en el documento original antes de aplicarla.";
+      }
+
+      if (
+        String(tipoSeccion).toLowerCase().includes("etiqueta")
+      ) {
+        interpretacion =
+          "Existe información farmacogenómica en una etiqueta regulatoria. Debe revisarse el texto oficial antes de modificar el tratamiento.";
+      }
+
+      if (
+        String(tipoSeccion).toLowerCase().includes("variante")
+      ) {
+        interpretacion =
+          "Registro informativo de variante. No implica por sí solo que deba cambiarse el medicamento o la dosis.";
+      }
+
+      return `
+        <strong>Gen:</strong>
+        ${escaparHTML(String(gen))}
+        <br>
+
+        <strong>Variante o registro:</strong>
+        ${escaparHTML(String(variante))}
+        <br>
+
+        <strong>Medicamento:</strong>
+        ${escaparHTML(String(medicamento))}
+        <br>
+
+        <strong>Nivel de evidencia:</strong>
+        ${escaparHTML(String(nivel))}
+        <br><br>
+
+        <strong>Resumen clínico:</strong>
+        ${escaparHTML(resumen)}
+
+        <div class="interpretation-box">
+          <strong>Interpretación:</strong>
+          ${escaparHTML(interpretacion)}
+        </div>
+      `;
+    }
+
+    function obtenerNivelEvidencia(registro) {
+      const nivel =
+        registro.levelOfEvidence ||
+        registro.evidenceLevel ||
+        registro.level ||
+        registro.score ||
+        null;
+
+      if (nivel && typeof nivel === "object") {
+        return (
+          nivel.term ||
+          nivel.name ||
+          nivel.label ||
+          nivel.value ||
+          JSON.stringify(nivel)
+        );
+      }
+
+      return nivel ?? "No especificado";
     }
 
     function resumirObjeto(objeto) {
