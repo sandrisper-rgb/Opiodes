@@ -827,7 +827,61 @@
       };
     }
 
-    function evaluarRelevanciaGen(gen, respuesta) {
+   function evaluarRelevanciaGen(gen, respuesta, farmaco) {
+  const resultados = respuesta.results || {};
+
+  const guias = extraerRegistros(
+    resultados.guidelineAnnotations?.data
+  );
+
+  const etiquetas = extraerRegistros(
+    resultados.labelAnnotations?.data
+  );
+
+  const clinicas = extraerRegistros(
+    resultados.clinicalAnnotations?.data
+  );
+
+  const guiasDelGen = guias.filter(registro =>
+    registroMencionaGen(registro, gen)
+  );
+
+  const etiquetasDelGen = etiquetas.filter(registro =>
+    registroMencionaGen(registro, gen)
+  );
+
+  const clinicasDelGen = clinicas.filter(registro =>
+    registroMencionaGen(registro, gen)
+  );
+
+  if (esParAccionableValidado(farmaco, gen)) {
+    return 4;
+  }
+
+  if (
+    guiasDelGen.length > 0 ||
+    etiquetasDelGen.length > 0
+  ) {
+    return 3;
+  }
+
+  if (clinicasDelGen.length > 0) {
+    return 2;
+  }
+
+  return 0;
+}
+
+function esParAccionableValidado(farmaco, gen) {
+  const paresAccionables = {
+    "Codeína": ["CYP2D6"],
+    "Tramadol": ["CYP2D6"]
+  };
+
+  return (
+    paresAccionables[farmaco]?.includes(gen) === true
+  );
+}
       const resultados = respuesta.results || {};
 
       const guias = extraerRegistros(
