@@ -785,6 +785,7 @@
     function construirDatosGraficas(consultas) {
       const genes = [];
       const puntuaciones = [];
+
       const categorias = {
         "Accionable": 0,
         "Evidencia clínica": 0,
@@ -801,28 +802,22 @@
           return;
         }
 
-        const s = item.respuesta.summary || {};
-        const guias = Number(s.guidelineAnnotations || 0);
-        const etiquetas = Number(s.labelAnnotations || 0);
-        const clinicas = Number(s.clinicalAnnotations || 0);
-        const variantes = Number(s.variantAnnotations || 0);
-
-        let puntuacion = 0;
-        let categoria = "Sin evidencia";
-
-        if (guias > 0) {
-          puntuacion = 4;
-          categoria = "Accionable";
-        } else if (etiquetas > 0 || clinicas >= 3) {
-          puntuacion = 3;
-          categoria = "Evidencia clínica";
-        } else if (clinicas > 0 || variantes > 0) {
-          puntuacion = 2;
-          categoria = "Informativa";
-        }
+        const puntuacion = evaluarRelevanciaGen(
+          item.gen,
+          item.respuesta
+        );
 
         puntuaciones.push(puntuacion);
-        categorias[categoria] += 1;
+
+        if (puntuacion === 4) {
+          categorias["Accionable"] += 1;
+        } else if (puntuacion === 3) {
+          categorias["Evidencia clínica"] += 1;
+        } else if (puntuacion === 2 || puntuacion === 1) {
+          categorias["Informativa"] += 1;
+        } else {
+          categorias["Sin evidencia"] += 1;
+        }
       });
 
       return {
@@ -830,6 +825,80 @@
         puntuaciones,
         categorias
       };
+    }
+
+    function evaluarRelevanciaGen(gen, respuesta) {
+      const resultados = respuesta.results || {};
+
+      const guias = extraerRegistros(
+        resultados.guidelineAnnotations?.data
+      );
+
+      const etiquetas = extraerRegistros(
+        resultados.labelAnnotations?.data
+      );
+
+      const clinicas = extraerRegistros(
+        resultados.clinicalAnnotations?.data
+      );
+
+      const guiasDelGen = guias.filter(registro =>
+        registroMencionaGen(registro, gen)
+      );
+
+      const etiquetasDelGen = etiquetas.filter(registro =>
+        registroMencionaGen(registro, gen)
+      );
+
+      const clinicasDelGen = clinicas.filter(registro =>
+        registroMencionaGen(registro, gen)
+      );
+
+      if (
+        guiasDelGen.length > 0 &&
+        tieneAccionConcreta(guiasDelGen)
+      ) {
+        return 4;
+      }
+
+      if (
+        etiquetasDelGen.length > 0 ||
+        clinicasDelGen.length >= 3
+      ) {
+        return 3;
+      }
+
+      if (
+        clinicasDelGen.length > 0 ||
+        guiasDelGen.length > 0
+      ) {
+        return 2;
+      }
+
+      return 0;
+    }
+
+    function registroMencionaGen(registro, gen) {
+      const texto = JSON.stringify(registro).toUpperCase();
+      return texto.includes(String(gen).toUpperCase());
+    }
+
+    function tieneAccionConcreta(registros) {
+      const texto = JSON.stringify(registros).toUpperCase();
+
+      const palabrasAccionables = [
+        "AVOID",
+        "ALTERNATIVE",
+        "ADJUST DOSE",
+        "REDUCE DOSE",
+        "INCREASE DOSE",
+        "RECOMMEND",
+        "CONSIDER"
+      ];
+
+      return palabrasAccionables.some(
+        palabra => texto.includes(palabra)
+      );
     }
 
     function dibujarGraficas(datos) {
