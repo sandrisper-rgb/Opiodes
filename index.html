@@ -785,22 +785,18 @@
     function construirDatosGraficas(consultas) {
       const genes = [];
       const puntuaciones = [];
+
       const farmaco =
         document.getElementById("farmaco").value;
 
       const categorias = {
         "Accionable": 0,
         "Guía o etiqueta": 0,
-        "Evidencia clínica": 0,
-        "Sin evidencia": 0
+        "Evidencia clínica": 0
       };
 
       consultas.forEach(item => {
-        genes.push(item.gen);
-
         if (!item.ok) {
-          puntuaciones.push(0);
-          categorias["Sin evidencia"] += 1;
           return;
         }
 
@@ -810,16 +806,23 @@
           farmaco
         );
 
+        /*
+          La gráfica clínica solo muestra genes con evidencia
+          específica para el medicamento seleccionado.
+        */
+        if (puntuacion <= 0) {
+          return;
+        }
+
+        genes.push(item.gen);
         puntuaciones.push(puntuacion);
 
         if (puntuacion === 4) {
           categorias["Accionable"] += 1;
         } else if (puntuacion === 3) {
           categorias["Guía o etiqueta"] += 1;
-        } else if (puntuacion === 2 || puntuacion === 1) {
-          categorias["Evidencia clínica"] += 1;
         } else {
-          categorias["Sin evidencia"] += 1;
+          categorias["Evidencia clínica"] += 1;
         }
       });
 
@@ -922,6 +925,24 @@
       const canvasEvidencia = document.getElementById("graficaEvidencia");
 
       if (!canvasRelevancia || !canvasEvidencia) return;
+
+      if (!datos.genes.length) {
+        canvasRelevancia.parentElement.innerHTML = `
+          <span class="badge-yellow">
+            No se encontraron genes con evidencia específica
+            para el opioide seleccionado.
+          </span>
+        `;
+
+        canvasEvidencia.parentElement.innerHTML = `
+          <span class="badge-yellow">
+            No hay evidencia específica suficiente para generar
+            una distribución por categorías.
+          </span>
+        `;
+
+        return;
+      }
 
       new Chart(canvasRelevancia, {
         type: "bar",
