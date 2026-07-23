@@ -1,170 +1,18 @@
- <!doctype html>
-<html lang="es">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Buscador Farmacogenético de Opioides</title>
+from pathlib import Path
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+html = Path("/mnt/data/index_clinpgx_ampliado.html").read_text(encoding="utf-8")
 
-  <style>
-    :root {
-      --navy: #082a5e;
-      --navy2: #0b3d7a;
-      --teal: #008c95;
-      --teal2: #00a7a7;
-      --card: rgba(255, 255, 255, 0.95);
-      --border: #d7e4ea;
-      --text: #10233f;
-      --muted: #6b7a90;
-    }
+# Add Chart.js script
+html = html.replace(
+    '<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>',
+    '<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>\n'
+    '  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>'
+)
 
-    * { box-sizing: border-box; }
-
-    body {
-      font-family: Arial, sans-serif;
-      background-image:
-        linear-gradient(rgba(244,249,251,.86), rgba(244,249,251,.86)),
-        url("opiodes2.png");
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      background-attachment: fixed;
-      margin: 0;
-      color: var(--text);
-    }
-
-    .container {
-      max-width: 1120px;
-      margin: 28px auto;
-      padding: 0 22px 30px;
-    }
-
-    .title {
-      background: linear-gradient(135deg, var(--navy), var(--navy2));
-      color: white;
-      font-weight: bold;
-      font-size: 28px;
-      padding: 26px 34px;
-      border-radius: 0 0 22px 22px;
-      margin-bottom: 26px;
-      box-shadow: 0 12px 28px rgba(8,42,94,.25);
-    }
-
-    .title::after {
-      content: "Apoyo a la decisión clínica personalizada";
-      display: block;
-      font-size: 16px;
-      font-weight: normal;
-      margin-top: 8px;
-      color: #dcecff;
-    }
-
-    .section-title {
-      font-weight: bold;
-      font-size: 21px;
-      color: var(--teal);
-      margin: 28px 0 18px;
-    }
-
-    .section-title::before {
-      content: "●";
-      color: var(--teal2);
-      margin-right: 10px;
-    }
-
-    .grid, .grid-2 {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 22px;
-      box-shadow: 0 8px 26px rgba(30,70,100,.10);
-      margin-bottom: 18px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
-    }
-
-    label {
-      font-weight: bold;
-      display: block;
-      margin-bottom: 8px;
-      color: var(--navy);
-      font-size: 14px;
-    }
-
-    select, input, textarea {
-      width: 100%;
-      padding: 13px 14px;
-      border: 1.5px solid #cfdbe4;
-      border-radius: 10px;
-      background: white;
-      font-size: 15px;
-      color: var(--text);
-      outline: none;
-    }
-
-    select:focus, input:focus, textarea:focus {
-      border-color: var(--teal);
-      box-shadow: 0 0 0 3px rgba(0,140,149,.12);
-    }
-
-    textarea {
-      min-height: 86px;
-      resize: vertical;
-    }
-
-    .upload-box {
-      border: 1px dashed var(--teal);
-      border-radius: 18px;
-      background: rgba(242,251,251,.95);
-      padding: 24px;
-      text-align: center;
-      margin-bottom: 22px;
-      box-shadow: 0 8px 26px rgba(30,70,100,.10);
-    }
-
-    button {
-      display: block;
-      margin: 22px auto;
-      padding: 14px 28px;
-      background: linear-gradient(135deg, var(--teal), var(--navy));
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-weight: bold;
-      font-size: 17px;
-      cursor: pointer;
-      box-shadow: 0 8px 18px rgba(8,42,94,.22);
-    }
-
-    button:disabled {
-      opacity: .65;
-      cursor: wait;
-    }
-
-    .result {
-      margin-top: 26px;
-      padding: 22px;
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      background: rgba(255,255,255,.96);
-      display: none;
-      line-height: 1.5;
-      box-shadow: 0 8px 26px rgba(30,70,100,.10);
-    }
-
-    .report-card {
-      background: white;
+# Add chart styles before media query
+chart_css = r'''
+    .chart-card {
+      background: #ffffff;
       border: 1px solid var(--border);
       border-radius: 16px;
       padding: 18px;
@@ -172,553 +20,22 @@
       box-shadow: 0 6px 18px rgba(30,70,100,.06);
     }
 
-    .report-title {
-      font-weight: bold;
-      font-size: 18px;
-      margin-bottom: 12px;
-      color: var(--navy);
-    }
-
-    .badge-green, .badge-yellow, .badge-red {
-      padding: 10px 12px;
-      border-radius: 10px;
-      margin: 8px 0;
-      font-weight: bold;
-      display: block;
-    }
-
-    .badge-green {
-      background: #e8f8ef;
-      border: 1px solid #52b788;
-      color: #0d6b3f;
-    }
-
-    .badge-yellow {
-      background: #fff8df;
-      border: 1px solid #e3b341;
-      color: #7a5500;
-    }
-
-    .badge-red {
-      background: #fdecec;
-      border: 1px solid #e07171;
-      color: #9b1c1c;
-    }
-
-    .table-wrap {
+    .chart-container {
+      position: relative;
       width: 100%;
-      overflow-x: auto;
-      margin-top: 14px;
+      min-height: 380px;
     }
 
-    table {
-      width: 100%;
-      min-width: 760px;
-      border-collapse: collapse;
-    }
-
-    th, td {
-      border: 1px solid var(--border);
-      padding: 10px;
-      text-align: left;
-      vertical-align: top;
-    }
-
-    th {
-      background: #eef7f8;
-      color: var(--navy);
-    }
-
-    details {
-      margin-top: 12px;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px 14px;
-      background: #fbfdfe;
-    }
-
-    summary {
-      cursor: pointer;
-      font-weight: bold;
-      color: var(--navy);
-    }
-
-    .annotation {
-      margin-top: 14px;
-      padding-top: 14px;
-      border-top: 1px solid var(--border);
-    }
-
-    .small {
+    .legend-note {
+      margin-top: 10px;
       font-size: 13px;
       color: var(--muted);
     }
-
-    @media (max-width: 800px) {
-      .grid, .grid-2 { grid-template-columns: 1fr; }
-      .title { font-size: 22px; padding: 22px; }
-      .container { padding: 0 12px 24px; }
-    }
-  </style>
-</head>
-
-<body>
-  <div class="container">
-    <div class="title">BUSCADOR FARMACOGENÉTICO DE OPIOIDES</div>
-
-    <div class="section-title">INFORMACIÓN CLÍNICA DEL PACIENTE</div>
-
-    <div class="grid">
-      <div>
-        <label for="edad">Edad</label>
-        <input id="edad" type="number" min="0" placeholder="Ej. 65">
-      </div>
-      <div>
-        <label for="peso">Peso kg</label>
-        <input id="peso" type="number" min="0" step="0.1" placeholder="Ej. 70">
-      </div>
-      <div>
-        <label for="sexo">Sexo</label>
-        <select id="sexo">
-          <option value="">Seleccione</option>
-          <option>Femenino</option>
-          <option>Masculino</option>
-          <option>Otro / No especificado</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="grid-2">
-      <div>
-        <label for="diagnostico">Diagnóstico o indicación clínica</label>
-        <textarea id="diagnostico" placeholder="Ej. dolor oncológico, postoperatorio, crónico..."></textarea>
-      </div>
-      <div>
-        <label for="medicamentos">Medicamentos concomitantes</label>
-        <textarea id="medicamentos" placeholder="Ej. benzodiacepinas, antidepresivos, gabapentinoides..."></textarea>
-      </div>
-    </div>
-
-    <div class="grid">
-      <div>
-        <label for="renal">Función renal</label>
-        <select id="renal">
-          <option value="">Seleccione</option>
-          <option>Normal / TFG > 90</option>
-          <option>Leve / TFG 60-89</option>
-          <option>Moderada / TFG 30-59</option>
-          <option>Severa / TFG 15-29</option>
-          <option>Falla renal / TFG < 15</option>
-          <option>Desconocida</option>
-        </select>
-      </div>
-
-      <div>
-        <label for="hepatica">Función hepática</label>
-        <select id="hepatica">
-          <option value="">Seleccione</option>
-          <option>Normal</option>
-          <option>Alteración leve</option>
-          <option>Alteración moderada</option>
-          <option>Alteración severa</option>
-          <option>Desconocida</option>
-        </select>
-      </div>
-
-      <div>
-        <label for="dolor">Tipo de dolor</label>
-        <select id="dolor">
-          <option value="">Seleccione</option>
-          <option>Agudo</option>
-          <option>Crónico</option>
-          <option>Oncológico</option>
-          <option>Postoperatorio</option>
-          <option>Paliativo</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="grid-2">
-      <div>
-        <label for="actual">Opioide actual</label>
-        <select id="actual">
-          <option value="">Seleccione</option>
-          <option>Ninguno</option>
-          <option>Codeína</option>
-          <option>Tramadol</option>
-          <option>Hidrocodona</option>
-          <option>Oxicodona</option>
-          <option>Morfina</option>
-          <option>Hidromorfona</option>
-          <option>Fentanilo</option>
-          <option>Metadona</option>
-          <option>Buprenorfina</option>
-          <option>Tapentadol</option>
-        </select>
-      </div>
-
-      <div>
-        <label for="adversos">Eventos adversos previos</label>
-        <textarea id="adversos" placeholder="Ej. sedación, náuseas, depresión respiratoria, falta de analgesia..."></textarea>
-      </div>
-    </div>
-
-    <div class="section-title">CARGA DE REPORTE FARMACOGENÉTICO</div>
-
-    <div class="upload-box">
-      <p>Suba un reporte farmacogenético en PDF. El sistema buscará genes, variantes y fenotipos.</p>
-      <input type="file" id="pdf" accept=".pdf,application/pdf">
-      <button id="botonPDF" type="button" onclick="leerPDF()">Leer PDF farmacogenético</button>
-    </div>
-
-    <div class="section-title">INFORME CONSOLIDADO</div>
-
-    <div class="grid-2">
-      <div>
-        <label for="farmaco">Opioide a evaluar</label>
-        <select id="farmaco">
-          <option value="">Seleccione</option>
-          <option>Codeína</option>
-          <option>Tramadol</option>
-          <option>Hidrocodona</option>
-          <option>Oxicodona</option>
-          <option>Morfina</option>
-          <option>Hidromorfona</option>
-          <option>Fentanilo</option>
-          <option>Metadona</option>
-          <option>Buprenorfina</option>
-          <option>Tapentadol</option>
-        </select>
-      </div>
-
-      <div>
-        <label for="modo">Nivel de detalle</label>
-        <select id="modo">
-          <option value="resumido">Resumen por gen</option>
-          <option value="completo">Todas las anotaciones</option>
-        </select>
-      </div>
-    </div>
-
-    <button id="botonConsultar" type="button" onclick="generarInforme()">
-      Generar informe completo
-    </button>
-
-    <div id="resultado" class="result" aria-live="polite"></div>
-  </div>
-
-  <script>
-    pdfjsLib.GlobalWorkerOptions.workerSrc =
-      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-
-    let genesDetectadosPDF = [];
-    let resultadosGenesPDF = {};
-
-    const genesFarmacogeneticos = [
-      "ABCB1","ABCC1","ABCC2","ABCC3","ABCG2","ANKK1","BDNF","CES1","COMT",
-      "CYP1A2","CYP2A6","CYP2B6","CYP2C8","CYP2C9","CYP2C19","CYP2D6",
-      "CYP2E1","CYP3A4","CYP3A5","CYP3A7","DRD2","FAAH","GABRA2","GABRB2",
-      "GABRG2","GRIK1","GRIN1","GRIN2A","GRIN2B","HTR1A","HTR2A","HTR2C",
-      "KCNJ6","MC1R","MTHFR","NR3C1","OPRD1","OPRK1","OPRL1","OPRM1",
-      "P2RX7","PDYN","POMC","SCN9A","SLC6A4","SULT1A1","UGT1A1","UGT1A3",
-      "UGT1A4","UGT1A6","UGT1A9","UGT2B4","UGT2B7","UGT2B15","UGT2B17"
-    ];
-
-    async function leerPDF() {
-      const archivo = document.getElementById("pdf").files[0];
-      const boton = document.getElementById("botonPDF");
-
-      if (!archivo) {
-        mostrarHTML("<div class='badge-yellow'>Debe seleccionar un PDF.</div>");
-        return;
-      }
-
-      boton.disabled = true;
-      boton.textContent = "Leyendo PDF...";
-
-      try {
-        const buffer = await archivo.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
-        let texto = "";
-
-        for (let paginaNumero = 1; paginaNumero <= pdf.numPages; paginaNumero++) {
-          const pagina = await pdf.getPage(paginaNumero);
-          const contenido = await pagina.getTextContent();
-          texto += " " + contenido.items.map(item => item.str).join(" ");
-        }
-
-        if (!texto.trim()) {
-          mostrarHTML(`
-            <div class="badge-yellow">
-              No fue posible extraer texto. El PDF podría estar escaneado como imagen.
-            </div>
-          `);
-          return;
-        }
-
-        analizarPDF(texto);
-
-      } catch (error) {
-        mostrarHTML(`
-          <div class="badge-red">No fue posible procesar el PDF.</div>
-          <p class="small">${escaparHTML(error.message)}</p>
-        `);
-      } finally {
-        boton.disabled = false;
-        boton.textContent = "Leer PDF farmacogenético";
-      }
-    }
-
-    function analizarPDF(textoOriginal) {
-      const texto = normalizarTexto(textoOriginal);
-
-      genesDetectadosPDF = genesFarmacogeneticos.filter(gen => {
-        const patron = new RegExp(`(^|[^A-Z0-9])${escaparRegex(gen)}([^A-Z0-9]|$)`, "i");
-        return patron.test(texto);
-      });
-
-      resultadosGenesPDF = {};
-
-      genesDetectadosPDF.forEach(gen => {
-        resultadosGenesPDF[gen] = extraerResultadoPorGen(texto, gen);
-      });
-
-      const filas = genesDetectadosPDF.map(gen => {
-        const r = resultadosGenesPDF[gen];
-        return `
-          <tr>
-            <td><strong>${escaparHTML(gen)}</strong></td>
-            <td>${escaparHTML(r.fenotipo)}</td>
-            <td>${escaparHTML(r.variantes.length ? r.variantes.join(", ") : "No identificadas")}</td>
-          </tr>
-        `;
-      }).join("");
-
-      mostrarHTML(`
-        <div class="report-card">
-          <div class="report-title">Reporte farmacogenético procesado</div>
-
-          <span class="badge-green">
-            El documento fue procesado correctamente.
-          </span>
-
-          <p><strong>Total de genes detectados:</strong> ${genesDetectadosPDF.length}</p>
-
-          ${
-            genesDetectadosPDF.length
-              ? `
-                <div class="table-wrap">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Gen</th>
-                        <th>Fenotipo o actividad aproximada</th>
-                        <th>Variantes detectadas</th>
-                      </tr>
-                    </thead>
-                    <tbody>${filas}</tbody>
-                  </table>
-                </div>
-              `
-              : `
-                <span class="badge-yellow">
-                  No se detectaron genes de la lista incluida en esta versión.
-                </span>
-              `
-          }
-
-          <p class="small">
-            La extracción automática debe verificarse contra el informe original.
-          </p>
-        </div>
-      `);
-    }
-
-    function extraerResultadoPorGen(texto, gen) {
-      const posicion = texto.indexOf(gen);
-      const inicio = Math.max(0, posicion - 350);
-      const final = Math.min(texto.length, posicion + gen.length + 700);
-      const ventana = texto.slice(inicio, final);
-
-      return {
-        fenotipo: detectarFenotipo(ventana),
-        variantes: detectarVariantes(ventana)
-      };
-    }
-
-    function detectarFenotipo(texto) {
-      const reglas = [
-        [["ULTRARAPID METABOLIZER","METABOLIZADOR ULTRARRAPIDO"], "Metabolizador ultrarrápido"],
-        [["POOR METABOLIZER","METABOLIZADOR LENTO"], "Metabolizador lento"],
-        [["INTERMEDIATE METABOLIZER","METABOLIZADOR INTERMEDIO"], "Metabolizador intermedio"],
-        [["NORMAL METABOLIZER","EXTENSIVE METABOLIZER","METABOLIZADOR NORMAL"], "Metabolizador normal"],
-        [["RAPID METABOLIZER","METABOLIZADOR RAPIDO"], "Metabolizador rápido"],
-        [["INCREASED ACTIVITY","INCREASED FUNCTION","ACTIVIDAD AUMENTADA"], "Actividad aumentada"],
-        [["DECREASED ACTIVITY","REDUCED FUNCTION","ACTIVIDAD REDUCIDA"], "Actividad reducida"],
-        [["NO FUNCTION","NULL FUNCTION","SIN FUNCION"], "Sin actividad funcional"],
-        [["NORMAL ACTIVITY","NORMAL FUNCTION","ACTIVIDAD NORMAL"], "Actividad normal"]
-      ];
-
-      for (const [expresiones, valor] of reglas) {
-        if (expresiones.some(expresion => texto.includes(expresion))) {
-          return valor;
-        }
-      }
-
-      return "No identificado";
-    }
-
-    function detectarVariantes(texto) {
-      const patrones = [
-        /\*[0-9]+[A-Z]?(?:X[0-9N]+)?/g,
-        /\bRS[0-9]+\b/g,
-        /\bC\.[0-9]+[A-Z]?>[A-Z]\b/g
-      ];
-
-      const resultados = [];
-
-      patrones.forEach(patron => {
-        (texto.match(patron) || []).forEach(v => resultados.push(v));
-      });
-
-      return [...new Set(resultados)].slice(0, 20);
-    }
-
-    async function generarInforme() {
-      const farmaco = document.getElementById("farmaco").value;
-      const boton = document.getElementById("botonConsultar");
-
-      if (!farmaco) {
-        mostrarHTML("<div class='badge-yellow'>Debe seleccionar el opioide.</div>");
-        return;
-      }
-
-      if (!genesDetectadosPDF.length) {
-        mostrarHTML("<div class='badge-yellow'>Primero cargue y procese el PDF.</div>");
-        return;
-      }
-
-      boton.disabled = true;
-      boton.textContent = "Consultando ClinPGx...";
-
-      try {
-        const consultas = [];
-
-        for (const gen of genesDetectadosPDF) {
-          try {
-            const respuesta = await consultarClinPGx(farmaco, gen);
-            consultas.push({ gen, ok: true, respuesta });
-          } catch (error) {
-            consultas.push({ gen, ok: false, error: error.message });
-          }
-        }
-
-        mostrarInformeConsolidado(farmaco, consultas);
-
-      } finally {
-        boton.disabled = false;
-        boton.textContent = "Generar informe completo";
-      }
-    }
-
-    async function consultarClinPGx(farmacoVisible, gen) {
-      const parametros = new URLSearchParams({
-        drug: convertirFarmacoParaAPI(farmacoVisible),
-        gene: gen
-      });
-
-      const respuesta = await fetch(`/api/clinpgx?${parametros.toString()}`);
-      const contenido = await respuesta.json();
-
-      if (!respuesta.ok) {
-        throw new Error(contenido.error || contenido.detail || `Error HTTP ${respuesta.status}`);
-      }
-
-      return contenido;
-    }
-
-    function mostrarInformeConsolidado(farmaco, consultas) {
-      const modo = document.getElementById("modo").value;
-
-      const filasResumen = consultas.map(item => {
-        const datosPDF = resultadosGenesPDF[item.gen] || {
-          fenotipo: "No identificado",
-          variantes: []
-        };
-
-        if (!item.ok) {
-          return `
-            <tr>
-              <td><strong>${escaparHTML(item.gen)}</strong></td>
-              <td>${escaparHTML(datosPDF.fenotipo)}</td>
-              <td>${escaparHTML(datosPDF.variantes.join(", ") || "No identificadas")}</td>
-              <td>Error</td>
-              <td>Error</td>
-              <td>Error</td>
-              <td>Error</td>
-            </tr>
-          `;
-        }
-
-        const s = item.respuesta.summary || {};
-
-        return `
-          <tr>
-            <td><strong>${escaparHTML(item.gen)}</strong></td>
-            <td>${escaparHTML(datosPDF.fenotipo)}</td>
-            <td>${escaparHTML(datosPDF.variantes.join(", ") || "No identificadas")}</td>
-            <td>${Number(s.clinicalAnnotations || 0)}</td>
-            <td>${Number(s.guidelineAnnotations || 0)}</td>
-            <td>${Number(s.labelAnnotations || 0)}</td>
-            <td>${Number(s.variantAnnotations || 0)}</td>
-          </tr>
-        `;
-      }).join("");
-
-      const detalles = consultas.map(item => {
-        if (!item.ok) {
-          return `
-            <details>
-              <summary>${escaparHTML(item.gen)} — error de consulta</summary>
-              <span class="badge-yellow">${escaparHTML(item.error)}</span>
-            </details>
-          `;
-        }
-
-        return generarDetalleClinPGx(item.gen, item.respuesta, modo);
-      }).join("");
-
-      mostrarHTML(`
-        <div class="report-card">
-          <div class="report-title">1. Resumen general</div>
-          <strong>Opioide evaluado:</strong> ${escaparHTML(farmaco)}<br>
-          <strong>Genes detectados:</strong> ${genesDetectadosPDF.length}<br>
-          <strong>Consultas realizadas:</strong> ${consultas.length}
-        </div>
-
-        ${generarResumenPaciente()}
-
-        <div class="report-card">
-          <div class="report-title">3. Resumen farmacogenético por gen</div>
-
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Gen</th>
-                  <th>Resultado PDF</th>
-                  <th>Variantes PDF</th>
-                  <th>Anotaciones clínicas</th>
-                  <th>Guías</th>
-                  <th>Etiquetas</th>
-                  <th>Variantes ClinPGx</th>
-                </tr>
-              </thead>
-              <tbody>${filasResumen}</tbody>
-            </table>
-          </div>
-        </div>
-
+'''
+html = html.replace('    @media (max-width: 800px) {', chart_css + '\n    @media (max-width: 800px) {')
+
+# Insert canvas cards into report output
+old = '''
         <div class="report-card">
           <div class="report-title">4. Evidencia ClinPGx detallada</div>
           ${detalles}
@@ -726,201 +43,203 @@
 
         <div class="report-card">
           <div class="report-title">5. Advertencia</div>
-          <p class="small">
-            Esta herramienta es un prototipo de apoyo a la decisión clínica.
-            No calcula una dosis automática ni reemplaza la revisión del médico,
-            la historia clínica, la ficha técnica, la confirmación del reporte
-            farmacogenético ni las guías profesionales vigentes.
+'''
+new = '''
+        <div class="chart-card">
+          <div class="report-title">4. Relevancia clínica por gen</div>
+          <div class="chart-container">
+            <canvas id="graficaRelevancia"></canvas>
+          </div>
+          <p class="legend-note">
+            La puntuación resume la evidencia recuperada: 4 = guía accionable,
+            3 = etiqueta o evidencia clínica relevante, 2 = evidencia limitada,
+            1 = informativa y 0 = sin evidencia recuperada.
           </p>
+        </div>
+
+        <div class="chart-card">
+          <div class="report-title">5. Distribución de la evidencia</div>
+          <div class="chart-container">
+            <canvas id="graficaEvidencia"></canvas>
+          </div>
+        </div>
+
+        <div class="report-card">
+          <div class="report-title">6. Evidencia ClinPGx detallada</div>
+          ${detalles}
+        </div>
+
+        <div class="report-card">
+          <div class="report-title">7. Advertencia</div>
+'''
+html = html.replace(old, new)
+
+# Add chart rendering call after mostrarHTML in mostrarInformeConsolidado
+old_call = '''
+      mostrarHTML(`
+        <div class="report-card">
+'''
+# only first occurrence in function? Could be multiple. We'll insert later by replacing closing of mostrarHTML block near function.
+marker = '''
         </div>
       `);
     }
 
-    function generarDetalleClinPGx(gen, respuesta, modo) {
-      const results = respuesta.results || {};
-      const warnings = Array.isArray(respuesta.warnings) ? respuesta.warnings : [];
-
-      const bloques = [
-        ["Anotaciones clínicas", results.clinicalAnnotations],
-        ["Guías farmacogenéticas", results.guidelineAnnotations],
-        ["Etiquetas farmacogenómicas", results.labelAnnotations],
-        ["Anotaciones de variantes", results.variantAnnotations]
-      ].map(([titulo, seccion]) => {
-        const registros = extraerRegistros(seccion && seccion.data);
-        const limite = modo === "resumido" ? 3 : registros.length;
-        const mostrados = registros.slice(0, limite);
-
-        return `
-          <div class="annotation">
-            <strong>${escaparHTML(titulo)}: ${registros.length}</strong>
-            ${
-              mostrados.length
-                ? mostrados.map((registro, indice) => {
-                    const encabezado =
-                      registro.allele ||
-                      registro.name ||
-                      registro.accessionId ||
-                      registro.id ||
-                      `Registro ${indice + 1}`;
-
-                    const texto =
-                      registro.phenotype ||
-                      registro.annotation ||
-                      registro.description ||
-                      registro.text ||
-                      resumirObjeto(registro);
-
-                    return `
-                      <details>
-                        <summary>${escaparHTML(String(encabezado))}</summary>
-                        <p>${escaparHTML(String(texto))}</p>
-                      </details>
-                    `;
-                  }).join("")
-                : `<p class="small">No se recuperaron registros en esta sección.</p>`
-            }
-          </div>
-        `;
-      }).join("");
-
-      const advertencias = warnings.length
-        ? warnings.map(w => `
-            <span class="badge-yellow">
-              ${escaparHTML(w.section || "Sección")}: ${escaparHTML(w.message || "No disponible")}
-            </span>
-          `).join("")
-        : "";
-
-      return `
-        <details>
-          <summary>${escaparHTML(gen)}</summary>
-          ${bloques}
-          ${advertencias}
-        </details>
-      `;
-    }
-
-    function extraerRegistros(contenido) {
-      if (!contenido) return [];
-      if (Array.isArray(contenido)) return contenido;
-      if (Array.isArray(contenido.data)) return contenido.data;
-      if (contenido.data && Array.isArray(contenido.data.data)) return contenido.data.data;
-      if (Array.isArray(contenido.results)) return contenido.results;
-      if (Array.isArray(contenido.items)) return contenido.items;
-      return [];
-    }
-
-    function generarResumenPaciente() {
-      const edad = document.getElementById("edad").value || "No registrada";
-      const peso = document.getElementById("peso").value || "No registrado";
-      const sexo = document.getElementById("sexo").value || "No registrado";
-      const diagnostico = document.getElementById("diagnostico").value || "No registrado";
-      const renal = document.getElementById("renal").value || "No registrada";
-      const hepatica = document.getElementById("hepatica").value || "No registrada";
-      const dolor = document.getElementById("dolor").value || "No registrado";
-      const actual = document.getElementById("actual").value || "No registrado";
-      const medicamentos = document.getElementById("medicamentos").value || "No registrados";
-      const adversos = document.getElementById("adversos").value || "No registrados";
-
-      let alertas = "";
-
-      if (edad !== "No registrada" && Number(edad) >= 65) {
-        alertas += "<span class='badge-yellow'>Edad ≥65 años: considerar mayor riesgo de sedación, caídas y eventos adversos.</span>";
-      }
-
-      if (renal.includes("Moderada") || renal.includes("Severa") || renal.includes("Falla")) {
-        alertas += "<span class='badge-yellow'>Función renal alterada: requiere revisión específica del opioide y sus metabolitos.</span>";
-      }
-
-      if (hepatica.includes("moderada") || hepatica.includes("severa")) {
-        alertas += "<span class='badge-yellow'>Función hepática alterada: requiere revisión de metabolismo y dosificación.</span>";
-      }
-
-      if (medicamentos !== "No registrados") {
-        alertas += "<span class='badge-yellow'>Revisar interacciones y depresores del sistema nervioso central.</span>";
-      }
-
-      if (adversos !== "No registrados") {
-        alertas += "<span class='badge-yellow'>Existen eventos adversos previos que deben influir en la selección del tratamiento.</span>";
-      }
-
-      return `
-        <div class="report-card">
-          <div class="report-title">2. Factores clínicos del paciente</div>
-          <strong>Edad:</strong> ${escaparHTML(edad)}<br>
-          <strong>Peso:</strong> ${escaparHTML(peso)}${peso !== "No registrado" ? " kg" : ""}<br>
-          <strong>Sexo:</strong> ${escaparHTML(sexo)}<br>
-          <strong>Diagnóstico:</strong> ${escaparHTML(diagnostico)}<br>
-          <strong>Tipo de dolor:</strong> ${escaparHTML(dolor)}<br>
-          <strong>Función renal:</strong> ${escaparHTML(renal)}<br>
-          <strong>Función hepática:</strong> ${escaparHTML(hepatica)}<br>
-          <strong>Opioide actual:</strong> ${escaparHTML(actual)}<br>
-          <strong>Medicamentos concomitantes:</strong> ${escaparHTML(medicamentos)}<br>
-          <strong>Eventos adversos:</strong> ${escaparHTML(adversos)}<br><br>
-          ${alertas || "<span class='badge-green'>No se generaron alertas clínicas adicionales con los datos ingresados.</span>"}
+    function generarDetalleClinPGx'''
+replacement = '''
         </div>
-      `;
+      `);
+
+      const datosGraficas = construirDatosGraficas(consultas);
+      dibujarGraficas(datosGraficas);
     }
 
-    function convertirFarmacoParaAPI(farmaco) {
-      const mapa = {
-        "Codeína": "codeine",
-        "Tramadol": "tramadol",
-        "Hidrocodona": "hydrocodone",
-        "Oxicodona": "oxycodone",
-        "Morfina": "morphine",
-        "Hidromorfona": "hydromorphone",
-        "Fentanilo": "fentanyl",
-        "Metadona": "methadone",
-        "Buprenorfina": "buprenorphine",
-        "Tapentadol": "tapentadol"
+    function generarDetalleClinPGx'''
+html = html.replace(marker, replacement, 1)
+
+# Add helper JS before generarDetalleClinPGx
+helpers = r'''
+    function construirDatosGraficas(consultas) {
+      const genes = [];
+      const puntuaciones = [];
+      const categorias = {
+        "Accionable": 0,
+        "Evidencia clínica": 0,
+        "Informativa": 0,
+        "Sin evidencia": 0
       };
 
-      return mapa[farmaco] || farmaco;
+      consultas.forEach(item => {
+        genes.push(item.gen);
+
+        if (!item.ok) {
+          puntuaciones.push(0);
+          categorias["Sin evidencia"] += 1;
+          return;
+        }
+
+        const s = item.respuesta.summary || {};
+        const guias = Number(s.guidelineAnnotations || 0);
+        const etiquetas = Number(s.labelAnnotations || 0);
+        const clinicas = Number(s.clinicalAnnotations || 0);
+        const variantes = Number(s.variantAnnotations || 0);
+
+        let puntuacion = 0;
+        let categoria = "Sin evidencia";
+
+        if (guias > 0) {
+          puntuacion = 4;
+          categoria = "Accionable";
+        } else if (etiquetas > 0 || clinicas >= 3) {
+          puntuacion = 3;
+          categoria = "Evidencia clínica";
+        } else if (clinicas > 0 || variantes > 0) {
+          puntuacion = 2;
+          categoria = "Informativa";
+        }
+
+        puntuaciones.push(puntuacion);
+        categorias[categoria] += 1;
+      });
+
+      return {
+        genes,
+        puntuaciones,
+        categorias
+      };
     }
 
-    function resumirObjeto(objeto) {
-      try {
-        const claves = ["title","summary","recommendation","guideline","label","gene","chemical"];
-        const partes = claves
-          .filter(clave => objeto && objeto[clave] != null)
-          .map(clave => `${clave}: ${typeof objeto[clave] === "object" ? JSON.stringify(objeto[clave]) : objeto[clave]}`);
+    function dibujarGraficas(datos) {
+      const canvasRelevancia = document.getElementById("graficaRelevancia");
+      const canvasEvidencia = document.getElementById("graficaEvidencia");
 
-        return partes.length ? partes.join(" | ") : JSON.stringify(objeto);
-      } catch {
-        return "Registro recuperado sin descripción textual.";
-      }
+      if (!canvasRelevancia || !canvasEvidencia) return;
+
+      new Chart(canvasRelevancia, {
+        type: "bar",
+        data: {
+          labels: datos.genes,
+          datasets: [{
+            label: "Nivel de relevancia",
+            data: datos.puntuaciones,
+            borderWidth: 1,
+            borderRadius: 6
+          }]
+        },
+        options: {
+          indexAxis: "y",
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              beginAtZero: true,
+              max: 4,
+              ticks: {
+                stepSize: 1
+              },
+              title: {
+                display: true,
+                text: "Nivel de relevancia clínica"
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: "Gen"
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              callbacks: {
+                label: context => {
+                  const etiquetas = {
+                    0: "Sin evidencia",
+                    1: "Informativa",
+                    2: "Evidencia limitada",
+                    3: "Evidencia clínica relevante",
+                    4: "Guía accionable"
+                  };
+
+                  return etiquetas[context.raw] || String(context.raw);
+                }
+              }
+            }
+          }
+        }
+      });
+
+      new Chart(canvasEvidencia, {
+        type: "doughnut",
+        data: {
+          labels: Object.keys(datos.categorias),
+          datasets: [{
+            data: Object.values(datos.categorias)
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: "bottom"
+            },
+            tooltip: {
+              callbacks: {
+                label: context => `${context.label}: ${context.raw} genes`
+              }
+            }
+          }
+        }
+      });
     }
 
-    function normalizarTexto(valor) {
-      return String(valor || "")
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toUpperCase()
-        .replace(/\s+/g, " ")
-        .trim();
-    }
+'''
+html = html.replace('    function generarDetalleClinPGx', helpers + '    function generarDetalleClinPGx', 1)
 
-    function escaparRegex(valor) {
-      return String(valor).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    }
-
-    function escaparHTML(valor) {
-      return String(valor ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
-
-    function mostrarHTML(html) {
-      const resultado = document.getElementById("resultado");
-      resultado.style.display = "block";
-      resultado.innerHTML = html;
-      resultado.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  </script>
-</body>
-</html>          
-     
+out = Path("/mnt/data/index_clinpgx_tabla_graficas.html")
+out.write_text(html, encoding="utf-8")
+print(out)
