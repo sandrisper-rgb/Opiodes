@@ -408,7 +408,15 @@
     <div class="upload-box">
       <p>Suba un reporte farmacogenético en PDF. El sistema buscará genes, variantes y fenotipos.</p>
       <input type="file" id="pdf" accept=".pdf,application/pdf">
-      <button id="botonPDF" type="button" onclick="leerPDF()">Leer PDF farmacogenético</button>
+
+      <div style="margin-top:14px; display:flex; align-items:flex-start; gap:8px;">
+        <input type="checkbox" id="autorizacion" onchange="document.getElementById('botonPDF').disabled = !this.checked;" style="margin-top:4px;">
+        <label for="autorizacion" style="font-weight:normal; font-size:0.9em;">
+          Autorizo que la información contenida en este documento sea recolectada y utilizada para el entrenamiento y mejora de esta herramienta.
+        </label>
+      </div>
+
+      <button id="botonPDF" type="button" onclick="leerPDF()" disabled style="margin-top:12px;">Leer PDF farmacogenético</button>
     </div>
 
     <div class="section-title">INFORME CONSOLIDADO</div>
